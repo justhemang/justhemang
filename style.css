@@ -10,7 +10,11 @@
   --light-dim: rgba(239,239,239,0.45);
   --nav-h: 70px;
 }
-
+.logo-img {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html{font-size:16px;scroll-behavior:smooth;}
 body{
@@ -69,19 +73,22 @@ body::before{
   opacity:0;transition:opacity .3s;
 }
 .nav-logo.vis{opacity:1;}
+.logo-icon{
+  width:34px;height:34px;flex-shrink:0;
+  border:1.5px solid var(--cyan);
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+.logo-icon::after{
+  content:'';position:absolute;inset:4px;
+  background:var(--cyan);
+  clip-path:polygon(0 0,100% 0,100% 65%,50% 100%,0 65%);
+}
 .logo-wordmark{
-  font-family:'Oswald',sans-serif;
-  font-weight:700;font-size:1.25rem;
-  letter-spacing:.06em;text-transform:uppercase;
-  color:var(--light);line-height:1;
-  display:flex;align-items:center;gap:0;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.2rem;letter-spacing:.12em;color:var(--light);line-height:1;
 }
-.logo-wordmark .lw-bracket{
-  color:var(--cyan);font-size:1.4rem;line-height:1;
-  font-weight:300;font-family:'Space Mono',monospace;
-}
-.logo-wordmark .lw-just{ color:var(--light); }
-.logo-wordmark .lw-hem { color:var(--cyan); }
+.logo-wordmark b{color:var(--cyan);font-weight:400;}
 .nav-links{display:flex;align-items:center;gap:2.5rem;list-style:none;}
 .nav-links a{
   font-family:'Space Mono',monospace;font-size:.66rem;
