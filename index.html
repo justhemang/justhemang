@@ -3964,13 +3964,21 @@ window.$RefreshSig$ = () => (type) => type;
   * {
     border-color: hsl(var(--border));
   }
+  html, body {
+    min-height: 100%;
+    overflow-x: hidden;
+  }
   body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background: var(--bg);
     color: #ffffff;
     font-family: 'Space Mono', monospace;
-    overflow-x: hidden;
+    overflow: hidden;
+  }
+  #root {
+    min-height: 100vh;
+    overflow-y: auto;
   }
 }
 html {
@@ -4590,7 +4598,7 @@ html {
           Available for freelance.
          </strong>
         </p>
-        <a data-component-name="Link" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:110:10" href="html/contact.html">
+        <a data-component-name="Link" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:110:10" href="html/page_4.html">
          <button class="brutal-border flex items-center gap-4 group" data-component-name="button" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:111:12" style='background: rgb(3, 3, 3); color: rgb(94, 242, 255); padding: 1rem 2rem; font-family: "Space Mono", monospace; font-weight: 700; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer;'>
           INQUIRIES
           <svg aria-hidden="true" class="lucide lucide-arrow-right group-hover:translate-x-2" data-component-name="ArrowRight" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:126:14" fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="transition: transform 0.2s;" viewbox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg">
