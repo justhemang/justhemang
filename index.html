@@ -1,5 +1,10 @@
 <html class="dark" lang="en">
  <head>
+  <!-- GSAP + Lenis Smooth Scroll -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
   <script type="module">
    import { createHotContext } from "/@vite/client";
 const hot = createHotContext("/__dummy__runtime-error-plugin");
@@ -1027,7 +1032,7 @@ window.$RefreshSig$ = () => (type) => type;
     cursor: default;
   }
   .cursor-pointer {
-    cursor: pointer;
+    cursor: default;
   }
   .cursor-text {
     cursor: text;
@@ -3950,6 +3955,12 @@ window.$RefreshSig$ = () => (type) => type;
   --border: 0 0% 15%;
   --primary: 186 90% 68%;
   --primary-foreground: 0 0% 2%;
+  --primary-hue: 186;
+  --primary-saturation: 90%;
+  --primary-lightness: 68%;
+  --cursor-color: hsl(calc(var(--primary-hue)), var(--primary-saturation), calc(100% - var(--primary-lightness)));
+  --cursor-border: hsl(calc(var(--primary-hue)), var(--primary-saturation), calc(100% - var(--primary-lightness)));
+  --cursor-size: 26px;
   --muted: 0 0% 8%;
   --muted-foreground: 0 0% 50%;
   --app-font-sans: 'Space Mono', monospace;
@@ -3957,6 +3968,37 @@ window.$RefreshSig$ = () => (type) => type;
   --app-font-display: 'Bebas Neue', sans-serif;
   --cyan: #5ef2ff;
   --bg: #030303;
+}
+#custom-cursor {
+  position: fixed;
+  z-index: 999999;
+  width: 10px;
+  height: 10px;
+  border: none;
+  border-radius: 9999px;
+  background-color: rgba(94, 242, 255, 0.95);
+  box-shadow: 0 0 8px rgba(94, 242, 255, 0.24);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: transform .12s ease, opacity .12s ease, background-color .12s ease, box-shadow .12s ease;
+  opacity: 1;
+}
+#custom-cursor.cursor-blue {
+  background-color: rgba(0, 121, 242, 0.95);
+  box-shadow: 0 0 10px rgba(0, 121, 242, 0.28);
+}
+#custom-cursor.cursor-black {
+  background-color: rgba(0, 0, 0, 0.95);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.24);
+}
+body {
+  cursor: none;
+}
+#custom-cursor.cursor-hover {
+  transform: translate(-50%, -50%) scale(1.3);
+}
+#custom-cursor.cursor-active {
+  transform: translate(-50%, -50%) scale(0.95);
 }
 @layer base {
   * {
@@ -3972,11 +4014,9 @@ window.$RefreshSig$ = () => (type) => type;
     background: var(--bg);
     color: #ffffff;
     font-family: 'Space Mono', monospace;
-    overflow: hidden;
   }
   #root {
     min-height: 100vh;
-    overflow-y: auto;
   }
 }
 html {
@@ -4491,146 +4531,2053 @@ html {
   }
 }
   </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const cursor = document.createElement('div');
+      cursor.id = 'custom-cursor';
+      document.body.appendChild(cursor);
+
+      function parseRgb(value) {
+        const match = value.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+        return match ? [Number(match[1]), Number(match[2]), Number(match[3])] : null;
+      }
+
+      function isBlueish(rgb) {
+        const [r, g, b] = rgb;
+        return b > r + 20 && b > g + 20 && b > 120;
+      }
+
+      function isDark(rgb) {
+        const [r, g, b] = rgb;
+        const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+        return luminance < 0.24;
+      }
+
+      function findBackgroundColor(element) {
+        if (!element || element === document.documentElement) return null;
+        const bg = window.getComputedStyle(element).backgroundColor;
+        if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'none') return bg;
+        return findBackgroundColor(element.parentElement);
+      }
+
+      function updateCursor(event) {
+        cursor.style.left = event.clientX + 'px';
+        cursor.style.top = event.clientY + 'px';
+
+        const hovered = document.elementFromPoint(event.clientX, event.clientY);
+        const rawBg = hovered ? findBackgroundColor(hovered) : null;
+        const rgb = rawBg ? parseRgb(rawBg) : null;
+
+        cursor.classList.remove('cursor-blue', 'cursor-black');
+        if (rgb) {
+          if (isDark(rgb)) {
+            cursor.classList.add('cursor-blue');
+          } else if (isBlueish(rgb)) {
+            cursor.classList.add('cursor-black');
+          }
+        }
+      }
+
+      document.addEventListener('mousemove', updateCursor);
+      document.addEventListener('mousedown', function() {
+        cursor.classList.add('cursor-active');
+      });
+      document.addEventListener('mouseup', function() {
+        cursor.classList.remove('cursor-active');
+      });
+
+      const interactiveElements = ['a', 'button', 'input', 'textarea', 'select', 'label', '[role="button"]'];
+      document.querySelectorAll(interactiveElements.join(',')).forEach(function(el) {
+        el.addEventListener('mouseenter', function() {
+          cursor.classList.add('cursor-hover');
+        });
+        el.addEventListener('mouseleave', function() {
+          cursor.classList.remove('cursor-hover');
+        });
+      });
+    });
+  </script>
  </head>
- <body style="padding-top: 45px;">
+ <body style="padding-top: 0px;">
+  <!-- ======CURSOR===========-->
+  <!-- ===== ENHANCED 3D ANIMATED PORTFOLIO ===== -->
+  <style>
+    /* ===== LOADING SCREEN ===== */
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: #030303;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 24px;
+    }
+    #loader .loader-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4rem;
+      color: #5ef2ff;
+      letter-spacing: 0.15em;
+      text-shadow: 0 0 40px rgba(94,242,255,0.6);
+    }
+    #loader .loader-bar-track {
+      width: 220px;
+      height: 3px;
+      background: rgba(94,242,255,0.15);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    #loader .loader-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #5ef2ff, #a78bfa);
+      border-radius: 2px;
+      transition: width 0.05s linear;
+    }
+    #loader .loader-percent {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.2em;
+    }
+
+    /* ===== NAVBAR ===== */
+    #main-nav {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      width: 72px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 0;
+      z-index: 50;
+      background: rgba(3,3,3,0.92);
+      border-right: 1px solid rgba(94,242,255,0.15);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    #main-nav .nav-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+    #main-nav .nav-logo img {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px rgba(94,242,255,0.5));
+      transition: filter 0.3s;
+    }
+    #main-nav .nav-logo:hover img {
+      filter: drop-shadow(0 0 14px rgba(94,242,255,0.9));
+    }
+    #main-nav .nav-brand {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      color: rgba(255,255,255,0.5);
+    }
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      flex: 1;
+      justify-content: center;
+      align-items: center;
+    }
+    .nav-link {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-family: 'Space Mono', monospace;
+      font-size: 9.5px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      text-decoration: none;
+      padding-left: 6px;
+      border-left: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s, text-shadow 0.2s;
+      position: relative;
+    }
+    .nav-link:hover, .nav-link.active {
+      color: #5ef2ff;
+      border-left-color: #5ef2ff;
+      text-shadow: 0 0 12px rgba(94,242,255,0.6);
+    }
+    .nav-socials {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+    .nav-social {
+      color: rgba(255,255,255,0.3);
+      transition: color 0.2s, transform 0.2s;
+      display: block;
+    }
+    .nav-social:hover {
+      color: #5ef2ff;
+      transform: scale(1.2);
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    #main-content {
+      margin-left: 72px;
+      /* NO overflow:hidden here — let the page scroll naturally */
+    }
+    html {
+      overflow-x: hidden;
+      overflow-y: auto;
+      height: auto;
+    }
+    body {
+      overflow-x: hidden;
+      overflow-y: visible;
+      height: auto;
+      scroll-behavior: auto; /* Lenis handles smooth scroll */
+    }
+
+    /* ===== HERO SECTION ===== */
+    #hero {
+      min-height: 100vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      border-bottom: 6px solid #5ef2ff;
+    }
+    .hero-bg-pattern {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.35;
+      background: repeating-linear-gradient(45deg, #030303, #030303 10px, #111 10px, #111 20px);
+    }
+    /* Radial glow accents */
+    .hero-glow-1 {
+      position: absolute;
+      top: 30%;
+      right: -10%;
+      width: 50vw;
+      height: 50vw;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(94,242,255,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      animation: glowPulse 6s ease-in-out infinite;
+    }
+    .hero-glow-2 {
+      position: absolute;
+      bottom: -15%;
+      left: 10%;
+      width: 40vw;
+      height: 40vw;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(167,139,250,0.06) 0%, transparent 70%);
+      pointer-events: none;
+      animation: glowPulse 8s ease-in-out infinite reverse;
+    }
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.15); }
+    }
+
+    /* Scanlines overlay */
+    .hero-scanlines {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,0.06) 3px,
+        rgba(0,0,0,0.06) 4px
+      );
+      z-index: 1;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      padding: 0 clamp(1.5rem, 5vw, 6rem);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 4rem;
+      width: 100%;
+    }
+    @media (max-width: 900px) {
+      .hero-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding-top: 100px;
+      }
+      .laptop-scene {
+        display: flex;
+        height: 60vh;
+        min-height: 480px;
+        width: 100%;
+        margin-top: 2rem;
+      }
+    }
+    .hero-text-side { position: relative; z-index: 2; }
+    .hero-eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: #5ef2ff;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      opacity: 0;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 1px;
+      background: #5ef2ff;
+      box-shadow: 0 0 8px #5ef2ff;
+    }
+    .hero-h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.5rem, 10vw, 10rem);
+      line-height: 0.84;
+      letter-spacing: -0.01em;
+      margin: 0;
+      text-transform: uppercase;
+    }
+    .hero-h1 .line-outline {
+      display: block;
+      color: transparent;
+      -webkit-text-stroke: 1.5px rgba(255,255,255,0.65);
+      opacity: 0;
+      transform: translateY(60px);
+    }
+    .hero-h1 .line-solid {
+      display: block;
+      color: #5ef2ff;
+      opacity: 0;
+      transform: translateY(60px) skewX(-8deg);
+    }
+    .hero-h1 .line-white {
+      display: block;
+      color: #fff;
+      opacity: 0;
+      transform: translateY(60px);
+    }
+    .hero-h1 .line-sub {
+      display: block;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(94,242,255,0.4);
+      font-size: 58%;
+      letter-spacing: 0.06em;
+      opacity: 0;
+      transform: translateY(60px);
+    }
+    .hero-divider {
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 1.5px solid rgba(255,255,255,0.12);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      max-width: 420px;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    .hero-desc {
+      font-family: 'Space Mono', monospace;
+      font-size: clamp(0.6rem, 1vw, 0.78rem);
+      line-height: 1.8;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .hero-desc strong {
+      color: #5ef2ff;
+      display: block;
+      margin-top: 0.5rem;
+      letter-spacing: 0.1em;
+    }
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      background: #030303;
+      color: #5ef2ff;
+      padding: 1rem 2rem;
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      border: 3px solid #5ef2ff;
+      box-shadow: 8px 8px 0px 0px #5ef2ff;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-cta::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(94,242,255,0.15), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .hero-cta:hover::before { opacity: 1; }
+    .hero-cta:hover {
+      transform: translate(4px, 4px);
+      box-shadow: 4px 4px 0px 0px #5ef2ff;
+    }
+    .hero-cta svg { transition: transform 0.25s ease; }
+    .hero-cta:hover svg { transform: translateX(6px); }
+
+    /* ===== STATS BAR ===== */
+    .hero-stats {
+      display: flex;
+      gap: 2.5rem;
+      margin-top: 2rem;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      line-height: 1;
+      color: #5ef2ff;
+      text-shadow: 0 0 20px rgba(94,242,255,0.4);
+    }
+    .stat-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+    }
+
+    /* ===== 3D LAPTOP SCENE ===== */
+    .laptop-scene {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1200px;
+      perspective-origin: 50% 50%;
+    }
+    #laptop-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 580px;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    /* Laptop CSS 3D model */
+    .laptop {
+      position: relative;
+      width: 100%;
+      transform-style: preserve-3d;
+      filter: drop-shadow(0 40px 80px rgba(0,0,0,0.8)) drop-shadow(0 0 60px rgba(94,242,255,0.15));
+    }
+    /* Screen part */
+    .laptop-lid {
+      position: relative;
+      width: 100%;
+      padding-bottom: 63%; /* 16:10 aspect */
+      transform-origin: bottom center;
+      transform: rotateX(-12deg);
+      transform-style: preserve-3d;
+    }
+    .laptop-screen-shell {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, #1a1a1e 0%, #0d0d10 100%);
+      border-radius: 12px 12px 6px 6px;
+      border: 2px solid rgba(94,242,255,0.12);
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.8),
+        0 -4px 20px rgba(94,242,255,0.08) inset;
+      overflow: hidden;
+    }
+    .laptop-bezel {
+      position: absolute;
+      inset: 10px;
+      background: #0a0a0c;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .laptop-screen {
+      position: absolute;
+      inset: 0;
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+      border-radius: 4px;
+    }
+    /* Screen shine effect */
+    .laptop-shine {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 50%, rgba(0,0,0,0.1) 100%);
+      pointer-events: none;
+      border-radius: 4px;
+    }
+    .laptop-notch {
+      position: absolute;
+      top: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 6px;
+      background: #0a0a0c;
+      border-radius: 0 0 6px 6px;
+      z-index: 10;
+    }
+    /* Webcam dot */
+    .laptop-cam {
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #222;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.1);
+      z-index: 11;
+    }
+    .laptop-cam::after {
+      content: '';
+      position: absolute;
+      inset: 1px;
+      border-radius: 50%;
+      background: rgba(94,242,255,0.4);
+      animation: camBlink 4s ease-in-out infinite;
+    }
+    @keyframes camBlink {
+      0%, 90%, 100% { opacity: 1; }
+      95% { opacity: 0; }
+    }
+    /* Base/keyboard */
+    .laptop-base {
+      position: relative;
+      width: 100%;
+      height: 28px;
+      background: linear-gradient(160deg, #1c1c20 0%, #141416 100%);
+      border-radius: 4px 4px 12px 12px;
+      border: 1px solid rgba(94,242,255,0.08);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+      margin-top: -2px;
+      transform: rotateX(6deg);
+      transform-origin: top center;
+    }
+    .laptop-trackpad {
+      position: absolute;
+      bottom: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 10px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    /* Keyboard glow */
+    .laptop-keyboard-glow {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60%;
+      background: linear-gradient(to top, rgba(94,242,255,0.06), transparent);
+      pointer-events: none;
+      border-radius: 0 0 12px 12px;
+    }
+    /* Screen glow reflection under laptop */
+    .laptop-reflection {
+      position: absolute;
+      bottom: -40px;
+      left: 10%;
+      right: 10%;
+      height: 40px;
+      background: radial-gradient(ellipse at center, rgba(94,242,255,0.12) 0%, transparent 70%);
+      filter: blur(8px);
+      pointer-events: none;
+    }
+    /* Floating particles around laptop */
+    .laptop-particles {
+      position: absolute;
+      inset: -60px;
+      pointer-events: none;
+      overflow: visible;
+    }
+    .l-particle {
+      position: absolute;
+      border-radius: 50%;
+      background: #5ef2ff;
+      opacity: 0;
+      animation: floatParticle var(--dur, 4s) ease-in-out infinite var(--delay, 0s);
+    }
+    @keyframes floatParticle {
+      0% { opacity: 0; transform: translateY(0) scale(0); }
+      20% { opacity: 0.8; transform: translateY(-20px) scale(1); }
+      80% { opacity: 0.4; transform: translateY(-80px) scale(0.5); }
+      100% { opacity: 0; transform: translateY(-120px) scale(0); }
+    }
+    /* Orbit ring */
+    .laptop-orbit {
+      position: absolute;
+      inset: -40px;
+      border-radius: 50%;
+      border: 1px solid rgba(94,242,255,0.08);
+      animation: orbitSpin 18s linear infinite;
+      pointer-events: none;
+    }
+    .laptop-orbit-dot {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #5ef2ff;
+      box-shadow: 0 0 10px #5ef2ff;
+    }
+    @keyframes orbitSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    /* Software tag floating */
+    .sw-tag {
+      position: absolute;
+      background: rgba(3,3,3,0.9);
+      border: 1px solid rgba(94,242,255,0.3);
+      backdrop-filter: blur(10px);
+      border-radius: 6px;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+      white-space: nowrap;
+      box-shadow: 0 0 20px rgba(94,242,255,0.1), 0 4px 20px rgba(0,0,0,0.5);
+      opacity: 0;
+    }
+    .sw-tag-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #5ef2ff;
+      box-shadow: 0 0 8px #5ef2ff;
+      animation: dotBlink 2s ease-in-out infinite;
+    }
+    @keyframes dotBlink {
+      0%, 100% { opacity: 1; box-shadow: 0 0 8px #5ef2ff; }
+      50% { opacity: 0.4; box-shadow: 0 0 4px #5ef2ff; }
+    }
+    .sw-tag-1 { top: 12%; right: -8%; }
+    .sw-tag-2 { bottom: 22%; right: -12%; }
+    .sw-tag-3 { top: 55%; left: -14%; }
+
+    /* Years badge */
+    .years-badge {
+      position: absolute;
+      top: -5%;
+      left: -6%;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: #5ef2ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #030303;
+      font-family: 'Bebas Neue', sans-serif;
+      box-shadow: 0 0 40px rgba(94,242,255,0.5);
+      animation: badgeSpin 8s linear infinite;
+      opacity: 0;
+      z-index: 5;
+    }
+    .years-badge .yb-num {
+      font-size: 2.2rem;
+      line-height: 1;
+    }
+    .years-badge .yb-text {
+      font-size: 0.55rem;
+      letter-spacing: 0.1em;
+      text-align: center;
+      line-height: 1.2;
+    }
+    @keyframes badgeSpin {
+      0%, 100% { transform: rotate(-5deg) scale(1); }
+      50% { transform: rotate(5deg) scale(1.05); }
+    }
+
+    /* ===== MARQUEE ===== */
+    .marquee-section {
+      background: #5ef2ff;
+      color: #030303;
+      padding: 1.2rem 0;
+      border-top: 4px solid #fff;
+      border-bottom: 4px solid #fff;
+      transform: rotate(-1.5deg) scaleX(1.05);
+      position: relative;
+      z-index: 20;
+      overflow: hidden;
+    }
+    .marquee {
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .marquee-inner {
+      display: inline-block;
+      animation: marquee 18s linear infinite;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ===== ABOUT STRIP ===== */
+    .about-strip {
+      background: #030303;
+      padding: 5rem clamp(1.5rem, 5vw, 6rem);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    @media (max-width: 768px) {
+      .about-strip { grid-template-columns: 1fr; }
+    }
+    .about-strip::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(94,242,255,0.4), transparent);
+    }
+    .about-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #5ef2ff;
+      margin-bottom: 1rem;
+    }
+    .about-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 6vw, 6rem);
+      line-height: 0.9;
+      color: #fff;
+      margin: 0 0 1.5rem;
+    }
+    .about-title span {
+      color: transparent;
+      -webkit-text-stroke: 1.5px #5ef2ff;
+    }
+    .about-body {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      line-height: 1.9;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      max-width: 420px;
+    }
+    .skills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .skill-card {
+      background: rgba(94,242,255,0.04);
+      border: 1px solid rgba(94,242,255,0.12);
+      border-radius: 4px;
+      padding: 1.2rem;
+      transition: background 0.3s, border-color 0.3s, transform 0.3s;
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+    .skill-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(94,242,255,0.06), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .skill-card:hover { background: rgba(94,242,255,0.08); border-color: rgba(94,242,255,0.35); transform: translateY(-3px); }
+    .skill-card:hover::after { opacity: 1; }
+    .skill-icon {
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+    }
+    .skill-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      color: #fff;
+      margin-bottom: 0.3rem;
+    }
+    .skill-desc {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.55rem;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* ===== FOOTER ===== */
+    .site-footer {
+      background: #030303;
+      border-top: 2px solid rgba(94,242,255,0.12);
+      padding: 3rem clamp(1.5rem, 5vw, 6rem);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.5);
+    }
+    .footer-copy {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .footer-cta {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      color: #5ef2ff;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: text-shadow 0.2s;
+    }
+    .footer-cta:hover { text-shadow: 0 0 20px rgba(94,242,255,0.8); }
+
+    /* ===== SCROLL INDICATOR ===== */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      z-index: 10;
+    }
+    .scroll-indicator .si-text {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+    .scroll-mouse {
+      width: 22px;
+      height: 34px;
+      border: 1.5px solid rgba(255,255,255,0.25);
+      border-radius: 11px;
+      position: relative;
+      overflow: hidden;
+    }
+    .scroll-mouse-inner {
+      width: 3px;
+      height: 7px;
+      background: #5ef2ff;
+      border-radius: 2px;
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: scrollBounce 1.8s ease-in-out infinite;
+    }
+    @keyframes scrollBounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+      50% { transform: translateX(-50%) translateY(12px); opacity: 0.3; }
+    }
+
+    /* ===== NOISE OVERLAY ===== */
+    .noise-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    /* ===== SPOTLIGHT EFFECT ===== */
+    #spotlight {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      background: radial-gradient(circle 400px at var(--mx, 50%) var(--my, 50%), rgba(94,242,255,0.04) 0%, transparent 70%);
+      transition: background 0.1s;
+    }
+  </style>
+
+  <!-- Loading Screen -->
+  <div id="loader">
+    <div class="loader-logo">JH</div>
+    <div class="loader-bar-track">
+      <div class="loader-bar-fill" id="loader-bar"></div>
+    </div>
+    <div class="loader-percent" id="loader-percent">0%</div>
+  </div>
+
+  <!-- Spotlight effect -->
+  <div id="spotlight"></div>
+
+  <!-- Noise overlay -->
+  <div class="noise-overlay"></div>
+
+  <!-- Main App -->
   <div id="root">
-   <div class="min-h-screen overflow-x-hidden" data-component-name="div" data-replit-metadata="artifacts/justhemang/src/pages/Home.tsx:7:4" style="background: rgb(3, 3, 3); color: rgb(255, 255, 255);">
-    <nav class="fixed left-0 top-0 h-screen w-16 md:w-20 flex flex-col justify-between items-center py-6 z-50" data-component-name="nav" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:23:4" style="background: rgb(3, 3, 3); border-right: 2px solid rgba(255, 255, 255, 0.12);">
-     <a data-component-name="Link" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:28:6" href="/">
-      <div data-component-name="div" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:29:8" style="display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; text-decoration: none;">
-       <img alt="JustHemang" data-component-name="img" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:30:10" src="images/logo-transparent.png" style="width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(rgba(94, 242, 255, 0.4) 0px 0px 6px);"/>
-       <span data-component-name="span" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:35:10" style='writing-mode: vertical-rl; transform: rotate(180deg); font-family: "Bebas Neue", sans-serif; font-size: 11px; letter-spacing: 0.22em; white-space: nowrap; color: rgba(255, 255, 255, 0.6);'>
-        JUST HEMANG
-       </span>
+
+    <!-- SIDEBAR NAV -->
+    <nav id="main-nav">
+      <a href="/" class="nav-logo">
+        <img src="images/logo-transparent.png" alt="JustHemang" />
+        <span class="nav-brand">JUST HEMANG</span>
+      </a>
+
+      <div class="nav-links">
+        <a href="/" class="nav-link active">HOME</a>
+        <a href="html/page_2.html" class="nav-link">WORK</a>
+        <a href="html/page_3.html" class="nav-link">SERVICES</a>
+        <a href="html/page_4.html" class="nav-link">CONTACT</a>
       </div>
-     </a>
-     <div class="flex flex-col items-center gap-8 flex-1 justify-center" data-component-name="div" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:52:6">
-      <a data-component-name="Link" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:56:12" href="/">
-       <span data-component-name="span" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:57:14" style='writing-mode: vertical-rl; transform: rotate(180deg); font-family: "Space Mono", monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgb(94, 242, 255); cursor: pointer; transition: color 0.2s; border-left: 2px solid rgb(94, 242, 255); padding-left: 6px; text-decoration: none; display: block;'>
-        HOME
-       </span>
-      </a>
-      <a data-component-name="Link" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:56:12" href="html\page_2.html">
-       <span data-component-name="span" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:57:14" style='writing-mode: vertical-rl; transform: rotate(180deg); font-family: "Space Mono", monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); cursor: pointer; transition: color 0.2s; border-left: 2px solid transparent; padding-left: 6px; text-decoration: none; display: block;'>
-        WORK
-       </span>
-      </a>
-      <a data-component-name="Link" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:56:12" href="html\page_3.html">
-       <span data-component-name="span" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:57:14" style='writing-mode: vertical-rl; transform: rotate(180deg); font-family: "Space Mono", monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); cursor: pointer; transition: color 0.2s; border-left: 2px solid transparent; padding-left: 6px; text-decoration: none; display: block;'>
-        SERVICES
-       </span>
-      </a>
-      <a data-component-name="Link" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:56:12" href="html\page_4.html">
-       <span data-component-name="span" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:57:14" style='writing-mode: vertical-rl; transform: rotate(180deg); font-family: "Space Mono", monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); cursor: pointer; transition: color 0.2s; border-left: 2px solid transparent; padding-left: 6px; text-decoration: none; display: block;'>
-        CONTACT
-       </span>
-      </a>
-     </div>
-     <div class="flex flex-col gap-5" data-component-name="div" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:88:6">
-      <a data-component-name="a" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:90:10" href="https://www.linkedin.com/in/hemang-luthra" rel="noopener noreferrer" style="color: rgba(255, 255, 255, 0.35); transition: color 0.2s;" target="_blank">
-       <svg aria-hidden="true" class="lucide lucide-linkedin" data-component-name="Icon" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:99:12" fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="15" xmlns="http://www.w3.org/2000/svg">
-        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z">
-        </path>
-        <rect height="12" width="4" x="2" y="9">
-        </rect>
-        <circle cx="4" cy="4" r="2">
-        </circle>
-       </svg>
-      </a>
-      <a data-component-name="a" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:90:10" href="https://www.youtube.com/@JustHemang" rel="noopener noreferrer" style="color: rgba(255, 255, 255, 0.35); transition: color 0.2s;" target="_blank">
-       <svg aria-hidden="true" class="lucide lucide-youtube" data-component-name="Icon" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:99:12" fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="15" xmlns="http://www.w3.org/2000/svg">
-        <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17">
-        </path>
-        <path d="m10 15 5-3-5-3z">
-        </path>
-       </svg>
-      </a>
-      <a data-component-name="a" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:90:10" href="https://www.instagram.com/justhemang6/" rel="noopener noreferrer" style="color: rgba(255, 255, 255, 0.35); transition: color 0.2s;" target="_blank">
-       <svg aria-hidden="true" class="lucide lucide-instagram" data-component-name="Icon" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:99:12" fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="15" xmlns="http://www.w3.org/2000/svg">
-        <rect height="20" rx="5" ry="5" width="20" x="2" y="2">
-        </rect>
-        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z">
-        </path>
-        <line x1="17.5" x2="17.51" y1="6.5" y2="6.5">
-        </line>
-       </svg>
-      </a>
-      <a data-component-name="a" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:90:10" href="https://github.com/Hemang-Luthra" rel="noopener noreferrer" style="color: rgba(255, 255, 255, 0.35); transition: color 0.2s;" target="_blank">
-       <svg aria-hidden="true" class="lucide lucide-github" data-component-name="Icon" data-replit-metadata="artifacts/justhemang/src/components/Navbar.tsx:99:12" fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="15" xmlns="http://www.w3.org/2000/svg">
-        <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4">
-        </path>
-        <path d="M9 18c-4.51 2-5-2-7-2">
-        </path>
-       </svg>
-      </a>
-     </div>
-    </nav>
-    <main class="pl-16 md:pl-20" data-component-name="main" data-replit-metadata="artifacts/justhemang/src/pages/Home.tsx:9:6">
-     <section class="min-h-screen relative flex flex-col justify-center overflow-hidden" data-component-name="section" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:6:4" id="home" style="border-bottom: 8px solid rgb(94, 242, 255);">
-      <div class="absolute inset-0 pointer-events-none" data-component-name="div" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:12:6" style="opacity: 0.45; background: repeating-linear-gradient(45deg, rgb(3, 3, 3), rgb(3, 3, 3) 10px, rgb(17, 17, 17) 10px, rgb(17, 17, 17) 20px);">
-      </div>
-      <div class="absolute pointer-events-none" data-component-name="div" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:21:6" style="top: 50%; right: 0px; transform: translate(45%, -50%); width: 60vw; height: 60vw; border-radius: 50%; border: 40px solid rgb(94, 242, 255); opacity: 0.18;">
-      </div>
-      <div class="relative z-10 px-6 md:px-12 lg:px-24" data-component-name="div" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:35:6">
-       <h1 class="glitch" data-component-name="h1" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:36:8" style='font-family: "Bebas Neue", sans-serif; font-size: clamp(3.8rem, 12vw, 12rem); line-height: 0.82; letter-spacing: -0.01em; margin: 0px; text-transform: uppercase;'>
-        <span data-component-name="span" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:47:10" style="display: block; color: transparent; -webkit-text-stroke: 1px rgba(255, 255, 255, 0.7); transition: transform 0.3s;">
-         VIDEO
-        </span>
-        <span data-component-name="span" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:59:10" style="display: block; color: rgb(94, 242, 255); transform: skewX(-8deg);">
-         EDITOR
-        </span>
-        <span data-component-name="span" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:62:10" style="display: block; color: transparent; -webkit-text-stroke: 1px rgba(255, 255, 255, 0.7); transition: transform 0.3s;">
-         GRAPHIC
-        </span>
-        <span data-component-name="span" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:74:10" style="display: block; color: rgb(255, 255, 255);">
-         DESIGNER
-        </span>
-        <span data-component-name="span" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:75:10" style="display: block; color: transparent; -webkit-text-stroke: 1px rgba(94, 242, 255, 0.5); font-size: 65%; letter-spacing: 0.05em; transition: transform 0.3s;">
-         FRONTEND DEV
-        </span>
-       </h1>
-       <div class="mt-10 flex flex-col md:flex-row gap-8 items-start md:items-end pt-8 max-w-4xl" data-component-name="div" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:91:8" style="border-top: 2px solid rgba(255, 255, 255, 0.15);">
-        <p class="max-w-md uppercase leading-relaxed" data-component-name="p" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:95:10" style='font-family: "Space Mono", monospace; font-size: clamp(0.65rem, 1.1vw, 0.8rem); color: rgba(255, 255, 255, 0.5);'>
-         Video editor, graphic designer, Photographer &amp; front-end developer based in the digital realm. I don't just push pixels — I slam them into place.
-         <strong data-component-name="strong" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:105:12" style="color: rgb(94, 242, 255); display: block; margin-top: 0.5rem;">
-          Available for freelance.
-         </strong>
-        </p>
-        <a data-component-name="Link" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:110:10" href="html/page_4.html">
-         <button class="brutal-border flex items-center gap-4 group" data-component-name="button" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:111:12" style='background: rgb(3, 3, 3); color: rgb(94, 242, 255); padding: 1rem 2rem; font-family: "Space Mono", monospace; font-weight: 700; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer;'>
-          INQUIRIES
-          <svg aria-hidden="true" class="lucide lucide-arrow-right group-hover:translate-x-2" data-component-name="ArrowRight" data-replit-metadata="artifacts/justhemang/src/components/Hero.tsx:126:14" fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="transition: transform 0.2s;" viewbox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg">
-           <path d="M5 12h14">
-           </path>
-           <path d="m12 5 7 7-7 7">
-           </path>
+
+      <div class="nav-socials">
+        <!-- LinkedIn -->
+        <a class="nav-social" href="https://www.linkedin.com/in/hemang-luthra" target="_blank" rel="noopener noreferrer" title="LinkedIn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+            <rect width="4" height="12" x="2" y="9"/>
+            <circle cx="4" cy="4" r="2"/>
           </svg>
-         </button>
         </a>
-       </div>
+        <!-- YouTube -->
+        <a class="nav-social" href="https://www.youtube.com/@JustHemang" target="_blank" rel="noopener noreferrer" title="YouTube">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/>
+            <path d="m10 15 5-3-5-3z"/>
+          </svg>
+        </a>
+        <!-- Instagram -->
+        <a class="nav-social" href="https://www.instagram.com/justhemang6/" target="_blank" rel="noopener noreferrer" title="Instagram">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+        </a>
+        <!-- GitHub -->
+        <a class="nav-social" href="https://github.com/Hemang-Luthra" target="_blank" rel="noopener noreferrer" title="GitHub">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
+            <path d="M9 18c-4.51 2-5-2-7-2"/>
+          </svg>
+        </a>
       </div>
-     </section>
-     <div data-component-name="div" data-replit-metadata="artifacts/justhemang/src/components/Marquee.tsx:6:4" style="background: rgb(94, 242, 255); color: rgb(3, 3, 3); padding: 1rem 0px; border-top: 4px solid rgb(255, 255, 255); border-bottom: 4px solid rgb(255, 255, 255); transform: rotate(-1.5deg) scaleX(1.05); position: relative; z-index: 20; overflow: hidden;">
-      <div class="marquee" data-component-name="div" data-replit-metadata="artifacts/justhemang/src/components/Marquee.tsx:19:6">
-       <span class="marquee-content" data-component-name="span" data-replit-metadata="artifacts/justhemang/src/components/Marquee.tsx:20:8" style='font-family: "Bebas Neue", sans-serif; font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: 0.1em; text-transform: uppercase;'>
-        FRONTEND DEVELOPER // VIDEO EDITOR // GRAPHIC DESIGNER // MOTION GRAPHICS // COLOR GRADING // FRONTEND DEVELOPER // VIDEO EDITOR // GRAPHIC DESIGNER // MOTION GRAPHICS // COLOR GRADING //
-       </span>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main id="main-content">
+
+      <!-- HERO SECTION -->
+      <section id="hero">
+        <!-- Background elements -->
+        <div class="hero-bg-pattern"></div>
+        <div class="hero-glow-1"></div>
+        <div class="hero-glow-2"></div>
+        <div class="hero-scanlines"></div>
+
+        <!-- Hero Content Grid -->
+        <div class="hero-content">
+
+          <!-- LEFT: Text -->
+          <div class="hero-text-side">
+            <div class="hero-eyebrow" id="hero-eyebrow">
+              AVAILABLE FOR FREELANCE &mdash; 2026
+            </div>
+
+            <h1 class="hero-h1 glitch" id="hero-h1">
+              <span class="line-outline" id="hl-1">VIDEO</span>
+              <span class="line-solid" id="hl-2">EDITOR</span>
+              <span class="line-outline" id="hl-3">GRAPHIC</span>
+              <span class="line-white" id="hl-4">DESIGNER</span>
+              <span class="line-sub" id="hl-5">FRONTEND DEV</span>
+            </h1>
+
+            <div class="hero-divider" id="hero-divider">
+              <p class="hero-desc">
+                Video editor, graphic designer, photographer &amp; front-end developer based in the digital realm.
+                I don't just push pixels — I slam them into place.
+                <strong>Available for freelance.</strong>
+              </p>
+              <a href="html/page_4.html" class="hero-cta" id="hero-cta">
+                INQUIRIES
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                </svg>
+              </a>
+            </div>
+
+            <!-- Stats -->
+            <div class="hero-stats" id="hero-stats">
+              <div class="stat-item">
+                <div class="stat-num" data-target="50">0</div>
+                <div class="stat-label">Projects</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-num" data-target="5">0</div>
+                <div class="stat-label">Years Exp.</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-num" data-target="30">0</div>
+                <div class="stat-label">Clients</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: 3D Laptop -->
+          <div class="laptop-scene">
+            <div id="laptop-wrapper">
+
+              <!-- Floating tags -->
+              <div class="sw-tag sw-tag-1" id="tag-premiere">
+                <div class="sw-tag-dot"></div>
+                PREMIERE PRO
+              </div>
+              <div class="sw-tag sw-tag-2" id="tag-ae">
+                <div class="sw-tag-dot" style="background:#a78bfa;box-shadow:0 0 8px #a78bfa;"></div>
+                AFTER EFFECTS
+              </div>
+              <div class="sw-tag sw-tag-3" id="tag-ps">
+                <div class="sw-tag-dot" style="background:#60a5fa;box-shadow:0 0 8px #60a5fa;"></div>
+                PHOTOSHOP
+              </div>
+
+              <!-- Years badge -->
+              <div class="years-badge" id="years-badge">
+                <div class="yb-num">5+</div>
+                <div class="yb-text">YRS<br>EXP</div>
+              </div>
+
+              <!-- Orbit ring -->
+              <div class="laptop-orbit">
+                <div class="laptop-orbit-dot"></div>
+              </div>
+
+              <!-- Particles -->
+              <div class="laptop-particles">
+                <div class="l-particle" style="width:4px;height:4px;left:20%;top:80%;--dur:3.5s;--delay:0s;"></div>
+                <div class="l-particle" style="width:3px;height:3px;left:50%;top:90%;--dur:4.2s;--delay:0.8s;"></div>
+                <div class="l-particle" style="width:5px;height:5px;left:75%;top:85%;--dur:3.8s;--delay:1.5s;"></div>
+                <div class="l-particle" style="width:2px;height:2px;left:35%;top:75%;--dur:5s;--delay:2.2s;"></div>
+                <div class="l-particle" style="width:4px;height:4px;left:60%;top:88%;--dur:3.2s;--delay:0.5s;"></div>
+              </div>
+
+              <!-- Laptop 3D Model -->
+              <div class="laptop">
+                <!-- Screen/Lid -->
+                <div class="laptop-lid">
+                  <div class="laptop-screen-shell">
+                    <div class="laptop-notch"></div>
+                    <div class="laptop-cam"></div>
+                    <div class="laptop-bezel">
+                      <img src="images/premiere_screen.png" alt="Adobe Premiere Pro" class="laptop-screen" id="laptop-screen-img" />
+                      <div class="laptop-shine"></div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Base -->
+                <div class="laptop-base">
+                  <div class="laptop-trackpad"></div>
+                  <div class="laptop-keyboard-glow"></div>
+                </div>
+                <!-- Ground reflection -->
+                <div class="laptop-reflection"></div>
+              </div>
+            </div>
+            
+            <!-- Interactive Skills Overlay (same page, no popup) -->
+            <div id="skills-interactive-container">
+              <button id="skills-close-btn" title="Close Toolkit">✕ CLOSE TOOLKIT</button>
+              
+              <svg id="skills-connections-svg">
+                <!-- SVG defs & paths generated programmatically in JS -->
+              </svg>
+              
+              <!-- 8 Skill Cards -->
+              <div class="sp-skill-card" data-skill-idx="0">
+                <div class="sp-card-name">Premiere Pro</div>
+                <div class="sp-card-sub">Video Editing</div>
+              </div>
+              
+              <div class="sp-skill-card" data-skill-idx="1">
+                <div class="sp-card-name">After Effects</div>
+                <div class="sp-card-sub">Motion Graphics</div>
+              </div>
+              
+              <div class="sp-skill-card" data-skill-idx="2">
+                <div class="sp-card-name">Photoshop</div>
+                <div class="sp-card-sub">Graphic Design</div>
+              </div>
+              
+              <div class="sp-skill-card" data-skill-idx="3">
+                <div class="sp-card-name">Illustrator</div>
+                <div class="sp-card-sub">Vector Design</div>
+              </div>
+              
+              <div class="sp-skill-card" data-skill-idx="4">
+                <div class="sp-card-name">React / Next.js</div>
+                <div class="sp-card-sub">Frontend Dev</div>
+              </div>
+              
+              <div class="sp-skill-card" data-skill-idx="5">
+                <div class="sp-card-name">HTML / CSS / JS</div>
+                <div class="sp-card-sub">Web Tech</div>
+              </div>
+              
+              <div class="sp-skill-card" data-skill-idx="6">
+                <div class="sp-card-name">DaVinci Resolve</div>
+                <div class="sp-card-sub">Color Grading</div>
+              </div>
+              
+              <div class="sp-skill-card" data-skill-idx="7">
+                <div class="sp-card-name">Photography</div>
+                <div class="sp-card-sub">Composition & Edit</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scroll indicator -->
+        <div class="scroll-indicator" id="scroll-indicator">
+          <div class="si-text">SCROLL</div>
+          <div class="scroll-mouse">
+            <div class="scroll-mouse-inner"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MARQUEE STRIP -->
+      <div class="marquee-section">
+        <div class="marquee">
+          <span class="marquee-inner">
+            FRONTEND DEVELOPER &nbsp;//&nbsp; VIDEO EDITOR &nbsp;//&nbsp; GRAPHIC DESIGNER &nbsp;//&nbsp; MOTION GRAPHICS &nbsp;//&nbsp; COLOR GRADING &nbsp;//&nbsp; FRONTEND DEVELOPER &nbsp;//&nbsp; VIDEO EDITOR &nbsp;//&nbsp; GRAPHIC DESIGNER &nbsp;//&nbsp; MOTION GRAPHICS &nbsp;//&nbsp; COLOR GRADING &nbsp;//&nbsp;
+          </span>
+        </div>
       </div>
-     </div>
+
+      <!-- ABOUT STRIP -->
+      <section class="about-strip">
+        <div>
+          <div class="about-label">// ABOUT</div>
+          <h2 class="about-title">THE <span>CRAFT</span><br>BEHIND<br>THE WORK</h2>
+          <p class="about-body">
+            Combining technical precision with creative vision. Every frame is intentional, every cut is deliberate. I specialize in high-impact video production, kinetic typography, and immersive digital experiences.
+          </p>
+        </div>
+        <div class="skills-grid">
+          <div class="skill-card">
+            <div class="skill-icon">🎬</div>
+            <div class="skill-name">Video Editing</div>
+            <div class="skill-desc">Premiere Pro · DaVinci</div>
+          </div>
+          <div class="skill-card">
+            <div class="skill-icon">🎨</div>
+            <div class="skill-name">Graphic Design</div>
+            <div class="skill-desc">Photoshop · Illustrator</div>
+          </div>
+          <div class="skill-card">
+            <div class="skill-icon">⚡</div>
+            <div class="skill-name">Motion Graphics</div>
+            <div class="skill-desc">After Effects · GSAP</div>
+          </div>
+          <div class="skill-card">
+            <div class="skill-icon">💻</div>
+            <div class="skill-name">Frontend Dev</div>
+            <div class="skill-desc">React · Next.js</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="site-footer">
+        <div class="footer-brand">JUST HEMANG</div>
+        <div class="footer-copy">&copy; 2026 — All Rights Reserved</div>
+        <a href="html/page_4.html" class="footer-cta">GET IN TOUCH &rarr;</a>
+      </footer>
+
     </main>
-   </div>
-   <div aria-label="Notifications (F8)" role="region" style="pointer-events: none;" tabindex="-1">
-    <ol class="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]" data-component-name="ToastViewport" data-replit-metadata="artifacts/justhemang/src/components/ui/toaster.tsx:30:6" tabindex="-1">
-    </ol>
-   </div>
   </div>
-  <script src="js/main.tsx" type="module">
-    <svg fill="currentColor" height="16" viewbox="0 0 24 24" width="16">
-     <path d="M5.293 5.293a1 1 0 0 1 1.414 0L12 10.586l5.293-5.293a1 1 0 1 1 1.414 1.414L13.414 12l5.293 5.293a1 1 0 0 1-1.414 1.414L12 13.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L10.586 12 5.293 6.707a1 1 0 0 1 0-1.414z">
-     </path>
-    </svg>
-   </button>
-  </div>
+
+  <!-- ===== GSAP ANIMATION SCRIPTS ===== -->
+  <style>
+    /* ===== INTERACTIVE SKILLS DISPLAY (IN-PLACE, NO POPUP) ===== */
+    #skills-interactive-container {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+    
+    /* Dimmer overlay */
+    #skills-dimmer {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 3, 4, 0.82);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: -1; /* behind the skills cards and laptop */
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+    .skills-active #skills-dimmer {
+      opacity: 1;
+      pointer-events: auto; /* intercept clicks to close */
+    }
+    
+    /* Active laptop scene elevation */
+    .skills-active .laptop-scene {
+      z-index: 100 !important;
+    }
+    
+    /* SVG connection canvas */
+    #skills-connections-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .skill-connection-line {
+      fill: none;
+      stroke: rgba(94, 242, 255, 0.55);
+      stroke-width: 1.5;
+      stroke-dasharray: 4 4;
+      pointer-events: none;
+    }
+    
+    /* Skill Cards shooting out */
+    .sp-skill-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) translate(var(--tx, 0px), var(--ty, 0px)) scale(0);
+      opacity: 0;
+      z-index: 5;
+      background: rgba(10, 10, 12, 0.88);
+      border: 1px solid rgba(94, 242, 255, 0.22);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 8px;
+      padding: 12px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      width: 150px;
+      box-shadow: 0 0 30px rgba(94, 242, 255, 0.05), 0 10px 30px rgba(0, 0, 0, 0.5);
+      pointer-events: none; /* enabled when open */
+      transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+      text-align: center;
+    }
+    .sp-skill-card.open {
+      pointer-events: auto;
+    }
+    .sp-skill-card:hover {
+      border-color: rgba(94, 242, 255, 0.6);
+      box-shadow: 0 0 35px rgba(94, 242, 255, 0.18), 0 10px 30px rgba(0, 0, 0, 0.6);
+      background: rgba(15, 15, 18, 0.95);
+    }
+    
+    /* Card content structure */
+    .sp-card-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.04em;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.1;
+    }
+    .sp-card-sub {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.55rem;
+      color: rgba(94, 242, 255, 0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    /* Close Toolkit Button */
+    #skills-close-btn {
+      position: absolute;
+      top: -20px;
+      right: 50%;
+      transform: translateX(50%) scale(0);
+      opacity: 0;
+      background: rgba(3, 3, 3, 0.9);
+      border: 1.5px solid rgba(94, 242, 255, 0.4);
+      color: #5ef2ff;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: bold;
+      letter-spacing: 0.15em;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      z-index: 15;
+      transition: background 0.3s, border-color 0.3s, color 0.3s;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    #skills-close-btn.visible {
+      pointer-events: auto;
+    }
+    #skills-close-btn:hover {
+      background: #5ef2ff;
+      color: #030303;
+      box-shadow: 0 0 15px rgba(94, 242, 255, 0.4);
+    }
+    
+    /* Symmetrical coordinates relative to the laptop wrapper center */
+    /* Left column (skills 0,1,2,3) */
+    .sp-skill-card[data-skill-idx="0"] { --tx: -240px; --ty: -180px; }
+    .sp-skill-card[data-skill-idx="1"] { --tx: -280px; --ty: -60px; }
+    .sp-skill-card[data-skill-idx="2"] { --tx: -280px; --ty: 60px; }
+    .sp-skill-card[data-skill-idx="3"] { --tx: -240px; --ty: 180px; }
+    /* Right column (skills 4,5,6,7) */
+    .sp-skill-card[data-skill-idx="4"] { --tx: 240px; --ty: -180px; }
+    .sp-skill-card[data-skill-idx="5"] { --tx: 280px; --ty: -60px; }
+    .sp-skill-card[data-skill-idx="6"] { --tx: 280px; --ty: 60px; }
+    .sp-skill-card[data-skill-idx="7"] { --tx: 240px; --ty: 180px; }
+    
+    /* Responsive overrides for smaller layouts */
+    @media (max-width: 1024px) {
+      .sp-skill-card[data-skill-idx="0"] { --tx: -190px; --ty: -150px; }
+      .sp-skill-card[data-skill-idx="1"] { --tx: -220px; --ty: -50px; }
+      .sp-skill-card[data-skill-idx="2"] { --tx: -220px; --ty: 50px; }
+      .sp-skill-card[data-skill-idx="3"] { --tx: -190px; --ty: 150px; }
+      .sp-skill-card[data-skill-idx="4"] { --tx: 190px; --ty: -150px; }
+      .sp-skill-card[data-skill-idx="5"] { --tx: 220px; --ty: -50px; }
+      .sp-skill-card[data-skill-idx="6"] { --tx: 220px; --ty: 50px; }
+      .sp-skill-card[data-skill-idx="7"] { --tx: 190px; --ty: 150px; }
+      .sp-skill-card {
+        width: 155px;
+        padding: 8px 12px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .sp-skill-card[data-skill-idx="0"] { --tx: -125px; --ty: -150px; }
+      .sp-skill-card[data-skill-idx="1"] { --tx: -145px; --ty: -50px; }
+      .sp-skill-card[data-skill-idx="2"] { --tx: -145px; --ty: 50px; }
+      .sp-skill-card[data-skill-idx="3"] { --tx: -125px; --ty: 150px; }
+      .sp-skill-card[data-skill-idx="4"] { --tx: 125px; --ty: -150px; }
+      .sp-skill-card[data-skill-idx="5"] { --tx: 145px; --ty: -50px; }
+      .sp-skill-card[data-skill-idx="6"] { --tx: 145px; --ty: 50px; }
+      .sp-skill-card[data-skill-idx="7"] { --tx: 125px; --ty: 150px; }
+      .sp-skill-card {
+        width: 125px;
+        padding: 6px 8px;
+      }
+      .sp-card-name { font-size: 0.8rem; }
+      .sp-card-icon { font-size: 0.95rem; }
+      #skills-close-btn {
+        top: -30px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      /* Stack closer or tighter on tiny screens */
+      .sp-skill-card[data-skill-idx="0"] { --tx: -85px; --ty: -160px; }
+      .sp-skill-card[data-skill-idx="1"] { --tx: -95px; --ty: -75px; }
+      .sp-skill-card[data-skill-idx="2"] { --tx: -95px; --ty: 10px; }
+      .sp-skill-card[data-skill-idx="3"] { --tx: -85px; --ty: 95px; }
+      .sp-skill-card[data-skill-idx="4"] { --tx: 85px; --ty: -160px; }
+      .sp-skill-card[data-skill-idx="5"] { --tx: 95px; --ty: -75px; }
+      .sp-skill-card[data-skill-idx="6"] { --tx: 95px; --ty: 10px; }
+      .sp-skill-card[data-skill-idx="7"] { --tx: 85px; --ty: 95px; }
+      .sp-skill-card {
+        width: 100px;
+        padding: 5px;
+      }
+      .sp-card-sub { display: none; }
+      .sp-card-name { font-size: 0.75rem; }
+      #skills-close-btn {
+        top: -45px;
+      }
+    }
+    /* Laptop clickable hint ring */
+    #laptop-wrapper {
+      cursor: pointer;
+    }
+    .laptop-click-hint {
+      position: absolute;
+      inset: -20px;
+      border-radius: 12px;
+      border: 2px dashed rgba(94,242,255,0);
+      pointer-events: none;
+      transition: border-color 0.3s;
+    }
+    #laptop-wrapper:hover .laptop-click-hint {
+      border-color: rgba(94,242,255,0.25);
+      animation: hintPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes hintPulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(94,242,255,0.08); }
+      50% { box-shadow: 0 0 0 12px rgba(94,242,255,0); }
+    }
+  </style>
+
+  <!-- Dimmer overlay for highlighting skills (same page) -->
+  <div id="skills-dimmer"></div>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // ===== SPOTLIGHT MOUSE FOLLOWER =====
+    const spotlight = document.getElementById('spotlight');
+    if (spotlight) {
+      document.addEventListener('mousemove', (e) => {
+        spotlight.style.setProperty('--mx', e.clientX + 'px');
+        spotlight.style.setProperty('--my', e.clientY + 'px');
+      });
+    }
+
+    // ===== IN-PLACE INTERACTIVE SKILLS DISPLAY =====
+    const laptopEl = document.getElementById('laptop-wrapper');
+    const skillsContainer = document.getElementById('skills-interactive-container');
+    const skillsDimmer = document.getElementById('skills-dimmer');
+    const skillsCloseBtn = document.getElementById('skills-close-btn');
+    const svgEl = document.getElementById('skills-connections-svg');
+    let skillsActive = false;
+    let floatTweens = [];
+
+    // Hint Ring / Label creation
+    if (laptopEl) {
+      const hint = document.createElement('div');
+      hint.className = 'laptop-click-hint';
+      laptopEl.appendChild(hint);
+      
+      const hintLabel = document.createElement('div');
+      hintLabel.style.cssText = `position:absolute;bottom:-2.5rem;left:50%;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(94,242,255,0.55);white-space:nowrap;opacity:0;pointer-events:none;`;
+      hintLabel.textContent = '// CLICK TO SEE MY SKILLS';
+      laptopEl.appendChild(hintLabel);
+      setTimeout(() => {
+        if (typeof gsap !== 'undefined') {
+          gsap.to(hintLabel, { opacity:1, duration:0.5, delay:2 });
+          gsap.to(hintLabel, { opacity:0, duration:0.5, delay:5, onComplete: () => hintLabel.remove() });
+        }
+      }, 100);
+    }
+
+    // Programmatically initialize connection line paths in SVG
+    if (svgEl) {
+      const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      svgEl.appendChild(defs);
+      
+      for (let i = 0; i < 8; i++) {
+        // Create mask
+        const mask = document.createElementNS('http://www.w3.org/2000/svg', 'mask');
+        mask.setAttribute('id', `skill-mask-${i}`);
+        
+        const maskPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        maskPath.setAttribute('id', `mask-path-${i}`);
+        maskPath.setAttribute('fill', 'none');
+        maskPath.setAttribute('stroke', 'white');
+        maskPath.setAttribute('stroke-width', '6');
+        mask.appendChild(maskPath);
+        defs.appendChild(mask);
+        
+        // Create dotted path
+        const linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        linePath.setAttribute('id', `skill-line-${i}`);
+        linePath.setAttribute('class', 'skill-connection-line');
+        linePath.setAttribute('mask', `url(#skill-mask-${i})`);
+        svgEl.appendChild(linePath);
+      }
+    }
+
+    // Function to calculate and update path curves dynamically
+    function updateCurves() {
+      if (!skillsActive || !svgEl) return;
+      const containerRect = svgEl.getBoundingClientRect();
+      const laptopScreen = document.getElementById('laptop-screen-img') || document.querySelector('.laptop-screen');
+      if (!laptopScreen) return;
+      
+      const screenRect = laptopScreen.getBoundingClientRect();
+      const startX = (screenRect.left + screenRect.width / 2) - containerRect.left;
+      const startY = (screenRect.top + screenRect.height / 2) - containerRect.top;
+      
+      const cards = document.querySelectorAll('.sp-skill-card');
+      cards.forEach((card, idx) => {
+        const cardRect = card.getBoundingClientRect();
+        let endX, endY;
+        
+        if (idx < 4) {
+          // Left cards connect to their middle right edge
+          endX = cardRect.right - containerRect.left;
+          endY = (cardRect.top + cardRect.height / 2) - containerRect.top;
+        } else {
+          // Right cards connect to their middle left edge
+          endX = cardRect.left - containerRect.left;
+          endY = (cardRect.top + cardRect.height / 2) - containerRect.top;
+        }
+        
+        const linePath = document.getElementById(`skill-line-${idx}`);
+        const maskPath = document.getElementById(`mask-path-${idx}`);
+        
+        if (linePath && maskPath) {
+          const controlX = startX + (endX - startX) * 0.45;
+          const d = `M ${startX} ${startY} C ${controlX} ${startY}, ${controlX} ${endY}, ${endX} ${endY}`;
+          linePath.setAttribute('d', d);
+          maskPath.setAttribute('d', d);
+          
+          // Re-update total length for correct mask stroke properties
+          const len = maskPath.getTotalLength();
+          maskPath.setAttribute('stroke-dasharray', len);
+          if (!maskPath.dataset.animating) {
+            maskPath.setAttribute('stroke-dashoffset', 0);
+          }
+        }
+      });
+    }
+
+    // Trigger update on resize / scroll to maintain connections
+    window.addEventListener('resize', updateCurves);
+    window.addEventListener('scroll', updateCurves);
+
+    function openSkills() {
+      if (skillsActive) return;
+      skillsActive = true;
+      document.body.classList.add('skills-active');
+      
+      // Stop Lenis scroll so user doesn't scroll away while viewing skills
+      if (window._lenis) window._lenis.stop();
+      
+      // Fade out software tags and years badge
+      gsap.to(['#tag-premiere', '#tag-ae', '#tag-ps', '#years-badge'], {
+        opacity: 0,
+        scale: 0.8,
+        duration: 0.3,
+        overwrite: 'auto'
+      });
+      
+      // Animate close button in
+      gsap.to(skillsCloseBtn, {
+        scale: 1,
+        opacity: 1,
+        duration: 0.4,
+        ease: 'back.out(1.5)',
+        delay: 0.2,
+        onStart: () => skillsCloseBtn.classList.add('visible')
+      });
+      
+      // Trigger SVG lines layout
+      setTimeout(updateCurves, 50);
+      
+      // Animate each card and its dotted path
+      const cards = document.querySelectorAll('.sp-skill-card');
+      cards.forEach((card, idx) => {
+        card.style.display = 'flex';
+        card.classList.add('open');
+        
+        // Set up GSAP timeline for this card
+        const tl = gsap.timeline({ delay: idx * 0.08 });
+        
+        // 1. Shoot out card
+        tl.fromTo(card, 
+          { scale: 0, opacity: 0 },
+          { 
+            scale: 1, 
+            opacity: 1, 
+            duration: 0.75, 
+            ease: 'back.out(1.4)'
+          }
+        );
+        
+        // 2. Animate connection line mask drawing itself
+        tl.add(() => {
+          const maskPath = document.getElementById(`mask-path-${idx}`);
+          if (maskPath) {
+            maskPath.dataset.animating = 'true';
+            const len = maskPath.getTotalLength();
+            gsap.fromTo(maskPath,
+              { strokeDashoffset: len },
+              {
+                strokeDashoffset: 0,
+                duration: 0.6,
+                ease: 'power2.out',
+                onComplete: () => {
+                  delete maskPath.dataset.animating;
+                  updateCurves();
+                }
+              }
+            );
+          }
+        }, '-=0.5');
+        
+        // 3. Start floating/bobbing once fully active
+        tl.add(() => {
+          const floatTween = gsap.to(card, {
+            y: '+=8',
+            x: '-=4',
+            duration: 2.2 + Math.random() * 1.5,
+            ease: 'sine.inOut',
+            yoyo: true,
+            repeat: -1,
+            delay: Math.random() * 1
+          });
+          floatTweens.push(floatTween);
+        });
+      });
+    }
+
+    function closeSkills() {
+      if (!skillsActive) return;
+      skillsActive = false;
+      
+      // Resume Lenis scroll
+      if (window._lenis) window._lenis.start();
+      
+      // Kill all floating animations
+      floatTweens.forEach(t => t.kill());
+      floatTweens = [];
+      
+      // Fade out close button
+      gsap.to(skillsCloseBtn, {
+        scale: 0,
+        opacity: 0,
+        duration: 0.3,
+        onComplete: () => skillsCloseBtn.classList.remove('visible')
+      });
+      
+      const cards = document.querySelectorAll('.sp-skill-card');
+      cards.forEach((card, idx) => {
+        card.classList.remove('open');
+        const maskPath = document.getElementById(`mask-path-${idx}`);
+        const len = maskPath ? maskPath.getTotalLength() : 300;
+        
+        const tl = gsap.timeline({
+          onComplete: () => {
+            card.style.display = 'none';
+            if (idx === cards.length - 1) {
+              document.body.classList.remove('skills-active');
+            }
+          }
+        });
+        
+        // Retract path mask
+        if (maskPath) {
+          tl.to(maskPath, { strokeDashoffset: len, duration: 0.4, ease: 'power2.in' });
+        }
+        
+        // Retract card back into laptop
+        tl.to(card, {
+          scale: 0,
+          opacity: 0,
+          duration: 0.45,
+          ease: 'power2.in'
+        }, '-=0.35');
+      });
+      
+      // Fade software tags back in
+      gsap.to(['#tag-premiere', '#tag-ae', '#tag-ps', '#years-badge'], {
+        opacity: 1,
+        scale: 1,
+        duration: 0.4,
+        delay: 0.2,
+        overwrite: 'auto'
+      });
+    }
+
+    if (laptopEl) laptopEl.addEventListener('click', openSkills);
+    if (skillsCloseBtn) skillsCloseBtn.addEventListener('click', closeSkills);
+    if (skillsDimmer) skillsDimmer.addEventListener('click', closeSkills);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSkills(); });
+
+    // ===== LOADING SCREEN =====
+
+    const loaderBar = document.getElementById('loader-bar');
+    const loaderPct = document.getElementById('loader-percent');
+    const loader = document.getElementById('loader');
+    let pct = 0;
+    const loadInterval = setInterval(() => {
+      pct += Math.random() * 12 + 3;
+      if (pct >= 100) { pct = 100; clearInterval(loadInterval); finishLoad(); }
+      loaderBar.style.width = pct + '%';
+      loaderPct.textContent = Math.floor(pct) + '%';
+    }, 80);
+
+    function finishLoad() {
+      setTimeout(() => {
+        gsap.to('#loader', {
+          yPercent: -100,
+          duration: 0.9,
+          ease: 'power3.inOut',
+          onComplete: () => { loader.style.display = 'none'; startAnimations(); }
+        });
+      }, 200);
+    }
+
+    // ===== MAIN ENTRANCE ANIMATIONS =====
+    function startAnimations() {
+      const tl = gsap.timeline();
+
+      // Eyebrow
+      tl.to('#hero-eyebrow', { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' })
+
+      // Hero text lines stagger
+      .to(['#hl-1','#hl-2','#hl-3','#hl-4','#hl-5'], {
+        opacity: 1,
+        y: 0,
+        skewX: 0,
+        stagger: 0.1,
+        duration: 0.85,
+        ease: 'power4.out'
+      }, '-=0.3')
+
+      // Divider / CTA
+      .to('#hero-divider', {
+        opacity: 1,
+        y: 0,
+        duration: 0.7,
+        ease: 'power3.out'
+      }, '-=0.4')
+
+      // Stats
+      .to('#hero-stats', {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        ease: 'power3.out'
+      }, '-=0.4')
+
+      // Laptop
+      .fromTo('#laptop-wrapper', {
+        opacity: 0,
+        y: 80,
+        rotateX: 20,
+        rotateY: -15,
+      }, {
+        opacity: 1,
+        y: 0,
+        rotateX: 0,
+        rotateY: 0,
+        duration: 1.2,
+        ease: 'power4.out'
+      }, '-=0.8')
+
+      // Float tags
+      .to(['#tag-premiere','#tag-ae','#tag-ps'], {
+        opacity: 1,
+        stagger: 0.15,
+        duration: 0.5,
+        ease: 'back.out(1.7)'
+      }, '-=0.4')
+
+      // Years badge
+      .to('#years-badge', {
+        opacity: 1,
+        scale: 1,
+        duration: 0.6,
+        ease: 'back.out(2)'
+      }, '-=0.3')
+
+      // Scroll indicator
+      .to('#scroll-indicator', {
+        opacity: 1,
+        duration: 0.5
+      }, '-=0.2');
+
+      // Counter animation
+      tl.add(() => {
+        document.querySelectorAll('.stat-num').forEach(el => {
+          const target = parseInt(el.dataset.target);
+          gsap.to({ val: 0 }, {
+            val: target,
+            duration: 1.5,
+            ease: 'power2.out',
+            onUpdate: function() {
+              el.textContent = Math.floor(this.targets()[0].val) + '+';
+            }
+          });
+        });
+      }, '-=1');
+    }
+
+    // ===== 3D LAPTOP — STILL + MOUSE TILT ONLY =====
+    const laptopWrapper = document.getElementById('laptop-wrapper');
+    let rotX = 0, rotY = 0, rotZ = 0;
+    let tRotX = 0, tRotY = 0, tRotZ = 0;
+    let isHovering = false;
+
+    // Gentle mouse-driven tilt (no autonomous sway)
+    document.addEventListener('mousemove', (e) => {
+      if (!laptopWrapper) return;
+      const nx = (e.clientX / window.innerWidth  - 0.5) * 2; // -1 to +1
+      const ny = (e.clientY / window.innerHeight - 0.5) * 2;
+      if (isHovering) {
+        tRotY =  nx * 25;  // ±25° yaw
+        tRotX = -ny * 15;  // ±15° pitch
+        tRotZ =  nx * 4;   // ±4°  roll
+      } else {
+        tRotY = nx * 8;
+        tRotX = -ny * 5;
+        tRotZ = 0;
+      }
+    });
+
+    document.querySelector('.laptop-scene')?.addEventListener('mouseenter', () => { isHovering = true; });
+    document.querySelector('.laptop-scene')?.addEventListener('mouseleave', () => { isHovering = false; tRotZ = 0; });
+
+    // Smooth lerp loop for tilt only
+    (function tiltLoop() {
+      const spd = 0.08;
+      rotX += (tRotX - rotX) * spd;
+      rotY += (tRotY - rotY) * spd;
+      rotZ += (tRotZ - rotZ) * spd;
+      if (laptopWrapper) {
+        gsap.set('#laptop-wrapper', {
+          rotateX: rotX, rotateY: rotY, rotateZ: rotZ,
+          transformPerspective: 900,
+          transformStyle: 'preserve-3d'
+        });
+      }
+      requestAnimationFrame(tiltLoop);
+    })();
+
+
+    // ===== SCROLL-DRIVEN LAPTOP JOURNEY =====
+    // Laptop moves to different positions as user scrolls through the hero
+    if (typeof ScrollTrigger !== 'undefined') {
+      gsap.registerPlugin(ScrollTrigger);
+
+      // --- Laptop: scroll-driven position journey ---
+      // It starts in default position (right column), then flies to new spots
+      const laptopJourney = gsap.timeline({
+        scrollTrigger: {
+          trigger: '#hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 1.5,          // smooth scrubbing
+        }
+      });
+      laptopJourney
+        // Phase 1: rise up and tilt forward (0→40% scroll)
+        .to('#laptop-wrapper', {
+          y: -80,
+          x: 40,
+          rotateY: -20,
+          rotateX: 8,
+          scale: 1.08,
+          duration: 0.4,
+          ease: 'none'
+        })
+        // Phase 2: sweep down-left and zoom (40→70%)
+        .to('#laptop-wrapper', {
+          y: 60,
+          x: -60,
+          rotateY: 15,
+          rotateX: -5,
+          scale: 0.92,
+          duration: 0.3,
+          ease: 'none'
+        })
+        // Phase 3: fly off bottom (70→100%)
+        .to('#laptop-wrapper', {
+          y: 200,
+          x: 0,
+          rotateX: 25,
+          rotateY: 0,
+          scale: 0.8,
+          opacity: 0,
+          duration: 0.3,
+          ease: 'none'
+        });
+
+      // --- Hero text: parallax up as you scroll ---
+      gsap.to('.hero-text-side', {
+        scrollTrigger: {
+          trigger: '#hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 1
+        },
+        y: -120,
+        opacity: 0
+      });
+
+      // --- Navbar glow ---
+      gsap.to('#main-nav', {
+        scrollTrigger: {
+          trigger: '#hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 0.5
+        },
+        borderRightColor: 'rgba(94,242,255,0.4)',
+      });
+
+      // About section
+      gsap.from('.about-title', {
+        scrollTrigger: { trigger: '.about-strip', start: 'top 80%' },
+        opacity: 0, y: 60, duration: 0.9, ease: 'power3.out'
+      });
+      gsap.from('.about-body', {
+        scrollTrigger: { trigger: '.about-strip', start: 'top 75%' },
+        opacity: 0, y: 40, duration: 0.8, ease: 'power3.out', delay: 0.15
+      });
+      gsap.from('.skill-card', {
+        scrollTrigger: { trigger: '.skills-grid', start: 'top 85%' },
+        opacity: 0, y: 50, rotateX: 20, stagger: 0.12,
+        duration: 0.7, ease: 'back.out(1.5)'
+      });
+      gsap.from('.site-footer', {
+        scrollTrigger: { trigger: '.site-footer', start: 'top 90%' },
+        opacity: 0, y: 30, duration: 0.7, ease: 'power3.out'
+      });
+    }
+
+    // NOTE: Lenis smooth scroll is handled by site-animations.js (loaded after this block)
+    // to avoid double-initialisation.
+
+    // ===== FLOATING TAGS AUTONOMOUS MOTION =====
+    gsap.to('#tag-premiere', {
+      y: '-=12',
+      x: '+=6',
+      duration: 3.5,
+      ease: 'sine.inOut',
+      yoyo: true,
+      repeat: -1
+    });
+    gsap.to('#tag-ae', {
+      y: '+=10',
+      x: '-=8',
+      duration: 4.2,
+      ease: 'sine.inOut',
+      yoyo: true,
+      repeat: -1
+    });
+    gsap.to('#tag-ps', {
+      y: '-=8',
+      x: '+=10',
+      duration: 3.8,
+      ease: 'sine.inOut',
+      yoyo: true,
+      repeat: -1
+    });
+
+    // ===== YEARS BADGE WIGGLE =====
+    gsap.to('#years-badge', {
+      rotation: 8,
+      duration: 2,
+      ease: 'sine.inOut',
+      yoyo: true,
+      repeat: -1
+    });
+
+    // ===== NAVBAR HOVER GLOW =====
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('mouseenter', () => {
+        gsap.to(link, { letterSpacing: '0.25em', duration: 0.2 });
+      });
+      link.addEventListener('mouseleave', () => {
+        if (!link.classList.contains('active')) {
+          gsap.to(link, { letterSpacing: '0.18em', duration: 0.2 });
+        }
+      });
+    });
+
+    // ===== MAGNETIC CTA BUTTON =====
+    const ctaBtn = document.getElementById('hero-cta');
+    if (ctaBtn) {
+      ctaBtn.addEventListener('mousemove', (e) => {
+        const rect = ctaBtn.getBoundingClientRect();
+        const dx = e.clientX - (rect.left + rect.width / 2);
+        const dy = e.clientY - (rect.top + rect.height / 2);
+        gsap.to(ctaBtn, { x: dx * 0.25, y: dy * 0.25, duration: 0.3 });
+      });
+      ctaBtn.addEventListener('mouseleave', () => {
+        gsap.to(ctaBtn, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.4)' });
+      });
+    }
+
+    // ===== GLITCH TEXT ON HOVER =====
+    document.querySelector('.hero-h1')?.addEventListener('mouseenter', () => {
+      const spans = document.querySelectorAll('.hero-h1 span');
+      gsap.to(spans, {
+        skewX: (i) => (i % 2 === 0 ? -5 : 5),
+        duration: 0.1,
+        stagger: 0.05,
+        yoyo: true,
+        repeat: 3
+      });
+    });
+
+  });
+  </script>
+
+  <!-- Shared cursor trail + Lenis + scroll reveals -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+  <script src="js/site-animations.js"></script>
   <div id="replit-pill-host">
   </div>
  </body>
