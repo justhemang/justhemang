@@ -392,6 +392,8 @@
                 <button class="tool-btn" id="tool-razor" title="Razor Tool (C)">C</button>
                 <button class="tool-btn" id="tool-hand" title="Hand Tool (H)">H</button>
                 <button class="tool-btn" id="tool-type" title="Type Tool (T)">T</button>
+                <button class="tool-btn" id="tool-move" title="Move Element (M)">M</button>
+                <button class="tool-btn" id="tool-mask" title="Mask Tool (K)">K</button>
               </div>
 
               <!-- TIMELINE PANEL -->
@@ -602,6 +604,14 @@
           cursor: text !important;
         }
         
+        body.tool-move, body.tool-move * {
+          cursor: move !important;
+        }
+        
+        body.tool-mask, body.tool-mask * {
+          cursor: crosshair !important;
+        }
+        
         body.tool-type [data-editable="true"] {
           outline: 1px dashed #1473e6 !important;
           background: rgba(20, 115, 230, 0.05) !important;
@@ -622,10 +632,14 @@
       // Set default cursor class
       document.body.classList.add('tool-select');
       
-      // Mark elements for Type Tool editing
+      // Mark elements for Type Tool editing — exclude pricing/package/button text
       document.querySelectorAll('h1, h2, h3, p, span, strong').forEach(el => {
         if (el.children.length === 0 && el.textContent.trim().length > 0) {
-          el.setAttribute('data-editable', 'true');
+          // Skip elements inside pricing cards, buttons, nav, package blocks
+          const skip = el.closest(
+            '.price, .pricing, .package, .plan, [class*="price"], [class*="package"], [class*="plan"], button, a, nav, .btn, .cta'
+          );
+          if (!skip) el.setAttribute('data-editable', 'true');
         }
       });
       
@@ -818,6 +832,80 @@
           text: e.target.textContent
         }, '*');
       }
+      // ── MOVE TOOL: drag elements freely ──────────────────────────────
+      let moveTarget = null, moveDragOffX = 0, moveDragOffY = 0;
+
+      function setupMoveTool() {
+        document.addEventListener('mousedown', (e) => {
+          if (!document.body.classList.contains('tool-move')) return;
+          const el = e.target.closest('section, article, .card, .skill-card, img, h1, h2, h3, p') || e.target;
+          if (!el || el === document.body || el === document.documentElement) return;
+          e.preventDefault();
+          moveTarget = el;
+          if (!el.style.position || el.style.position === 'static') el.style.position = 'relative';
+          el.style.zIndex = '9999';
+          el.style.outline = '1.5px dashed #5ef2ff';
+          const rect = el.getBoundingClientRect();
+          moveDragOffX = e.clientX - rect.left;
+          moveDragOffY = e.clientY - rect.top;
+        });
+        document.addEventListener('mousemove', (e) => {
+          if (!moveTarget) return;
+          moveTarget.style.left = (e.clientX - moveDragOffX) + 'px';
+          moveTarget.style.top  = (e.clientY - moveDragOffY) + 'px';
+        });
+        document.addEventListener('mouseup', () => {
+          if (moveTarget) { moveTarget.style.outline = ''; moveTarget = null; }
+        });
+      }
+      setupMoveTool();
+
+      // ── MASK TOOL: draw a rectangular clip-path mask on click ─────────
+      let maskOverlay = null, maskStart = null;
+
+      function setupMaskTool() {
+        document.addEventListener('mousedown', (e) => {
+          if (!document.body.classList.contains('tool-mask')) return;
+          e.preventDefault();
+          maskStart = { x: e.clientX, y: e.clientY };
+          maskOverlay = document.createElement('div');
+          maskOverlay.id = 'pr-mask-overlay';
+          Object.assign(maskOverlay.style, {
+            position: 'fixed', border: '2px dashed #5ef2ff',
+            background: 'rgba(94,242,255,0.06)', pointerEvents: 'none',
+            zIndex: '99999', left: e.clientX + 'px', top: e.clientY + 'px',
+            width: '0', height: '0'
+          });
+          document.body.appendChild(maskOverlay);
+        });
+        document.addEventListener('mousemove', (e) => {
+          if (!maskOverlay || !maskStart) return;
+          const x = Math.min(e.clientX, maskStart.x);
+          const y = Math.min(e.clientY, maskStart.y);
+          const w = Math.abs(e.clientX - maskStart.x);
+          const h = Math.abs(e.clientY - maskStart.y);
+          Object.assign(maskOverlay.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' });
+        });
+        document.addEventListener('mouseup', (e) => {
+          if (!maskOverlay || !maskStart) return;
+          // Apply the drawn rectangle as a clip-path mask on the element under it
+          const rect = maskOverlay.getBoundingClientRect();
+          maskOverlay.remove(); maskOverlay = null; maskStart = null;
+          const target = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+          if (target && target !== document.body) {
+            const tr = target.getBoundingClientRect();
+            // Convert mask rect to % relative to target
+            const l = ((rect.left - tr.left) / tr.width * 100).toFixed(1);
+            const t = ((rect.top  - tr.top)  / tr.height * 100).toFixed(1);
+            const r = ((rect.right - tr.left) / tr.width * 100).toFixed(1);
+            const b = ((rect.bottom - tr.top) / tr.height * 100).toFixed(1);
+            target.style.clipPath = `inset(${t}% ${(100 - parseFloat(r)).toFixed(1)}% ${(100 - parseFloat(b)).toFixed(1)}% ${l}%)`;
+            target.style.outline = '1px solid rgba(94,242,255,0.3)';
+            window.parent.postMessage({ type: 'mask-applied', element: target.tagName }, '*');
+          }
+        });
+      }
+      setupMaskTool();
     });
   }
 })();

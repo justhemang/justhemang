@@ -1197,3 +1197,5 @@ body.tool-select a, body.tool-select button, body.tool-select .ws-tab, body.tool
   #pr-monitor-slate { width: 100% !important; height: 100% !important; }
   #pr-editor { width: 100vw !important; height: 100dvh !important; overflow: hidden !important; }
 }
+body.tool-move, body.tool-move .pane { cursor: move; }
+body.tool-mask, body.tool-mask .pane { cursor: crosshair; }

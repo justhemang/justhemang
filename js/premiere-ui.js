@@ -716,7 +716,9 @@
       select: document.getElementById('tool-select'),
       razor: document.getElementById('tool-razor'),
       hand: document.getElementById('tool-hand'),
-      type: document.getElementById('tool-type')
+      type: document.getElementById('tool-type'),
+      move: document.getElementById('tool-move'),
+      mask: document.getElementById('tool-mask')
     };
 
     Object.keys(toolButtons).forEach(tool => {
@@ -729,7 +731,7 @@
         addHistoryStep(`Select Tool: ${tool}`);
         
         // Toggle cursor class on parent document body
-        document.body.classList.remove('tool-select', 'tool-razor', 'tool-hand', 'tool-type');
+        document.body.classList.remove('tool-select', 'tool-razor', 'tool-hand', 'tool-type', 'tool-move', 'tool-mask');
         document.body.classList.add(`tool-${tool}`);
         
         // Notify Iframe of tool switch
