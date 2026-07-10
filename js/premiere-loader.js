@@ -549,6 +549,10 @@
       const iframeStyle = document.createElement('style');
       iframeStyle.id = 'iframe-editor-style';
       iframeStyle.textContent = `
+        /* Scale down entire page to fit inside editor preview */
+        html {
+          zoom: 0.7;
+        }
         /* Hide default scrollbars */
         html, body {
           scrollbar-width: none !important;
