@@ -16,139 +16,143 @@
   }
 
   // ── Cursor trail ─────────────────────────────────────────────────────
-  // Inject trail styles once
-  if (!document.getElementById('cursor-trail-style')) {
-    const s = document.createElement('style');
-    s.id = 'cursor-trail-style';
-    s.textContent = `
-      body { cursor: none !important; }
-      a, button, [role="button"], .skill-card, .laptop, #laptop-wrapper { cursor: none !important; }
-      .ct-dot {
-        position: fixed;
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 999999;
-        transform: translate(-50%, -50%);
-        mix-blend-mode: normal;
-        will-change: transform, opacity;
-      }
-      /* Main cursor dot */
-      .ct-dot.ct-main {
-        width: 10px; height: 10px;
-        background: rgba(94,242,255,1);
-        box-shadow: 0 0 12px rgba(94,242,255,0.8), 0 0 30px rgba(94,242,255,0.3);
-        transition: width .15s, height .15s, background .15s, box-shadow .15s;
-      }
-      .ct-dot.ct-main.hovered {
-        width: 28px; height: 28px;
-        background: rgba(94,242,255,0.25);
-        box-shadow: 0 0 20px rgba(94,242,255,0.5);
-      }
-      .ct-dot.ct-main.clicked {
-        width: 6px; height: 6px;
-        background: #fff;
-        box-shadow: 0 0 20px rgba(255,255,255,0.9);
-      }
-      /* Ring */
-      .ct-dot.ct-ring {
-        width: 28px; height: 28px;
-        border: 1.5px solid rgba(94,242,255,0.45);
-        background: transparent;
-        transition: width .2s, height .2s, border-color .2s;
-      }
-      .ct-dot.ct-ring.hovered {
-        width: 50px; height: 50px;
-        border-color: rgba(94,242,255,0.2);
-      }
-      /* Trail dots */
-      .ct-dot.ct-trail {
-        background: rgba(94,242,255,1);
-      }
-    `;
-    document.head.appendChild(s);
-  }
+  // Bypass completely if running in the Premiere Editor workspace environment
+  const isEditorActive = window.self !== window.top || document.getElementById('pr-program-monitor') !== null || (window.top && window.top.document && window.top.document.getElementById('pr-program-monitor') !== null);
+  if (!isEditorActive) {
+    // Inject trail styles once
+    if (!document.getElementById('cursor-trail-style')) {
+      const s = document.createElement('style');
+      s.id = 'cursor-trail-style';
+      s.textContent = `
+        body { cursor: none !important; }
+        a, button, [role="button"], .skill-card, .laptop, #laptop-wrapper { cursor: none !important; }
+        .ct-dot {
+          position: fixed;
+          border-radius: 50%;
+          pointer-events: none;
+          z-index: 999999;
+          transform: translate(-50%, -50%);
+          mix-blend-mode: normal;
+          will-change: transform, opacity;
+        }
+        /* Main cursor dot */
+        .ct-dot.ct-main {
+          width: 10px; height: 10px;
+          background: rgba(94,242,255,1);
+          box-shadow: 0 0 12px rgba(94,242,255,0.8), 0 0 30px rgba(94,242,255,0.3);
+          transition: width .15s, height .15s, background .15s, box-shadow .15s;
+        }
+        .ct-dot.ct-main.hovered {
+          width: 28px; height: 28px;
+          background: rgba(94,242,255,0.25);
+          box-shadow: 0 0 20px rgba(94,242,255,0.5);
+        }
+        .ct-dot.ct-main.clicked {
+          width: 6px; height: 6px;
+          background: #fff;
+          box-shadow: 0 0 20px rgba(255,255,255,0.9);
+        }
+        /* Ring */
+        .ct-dot.ct-ring {
+          width: 28px; height: 28px;
+          border: 1.5px solid rgba(94,242,255,0.45);
+          background: transparent;
+          transition: width .2s, height .2s, border-color .2s;
+        }
+        .ct-dot.ct-ring.hovered {
+          width: 50px; height: 50px;
+          border-color: rgba(94,242,255,0.2);
+        }
+        /* Trail dots */
+        .ct-dot.ct-trail {
+          background: rgba(94,242,255,1);
+        }
+      `;
+      document.head.appendChild(s);
+    }
 
-  // Build trail dots
-  const TRAIL_COUNT = 8;
-  const trailDots = [];
-  let mx = -200, my = -200; // raw mouse
-  let rx = -200, ry = -200; // ring lerp
-  const dotPositions = Array.from({ length: TRAIL_COUNT }, () => ({ x: -200, y: -200 }));
+    // Build trail dots
+    const TRAIL_COUNT = 8;
+    const trailDots = [];
+    let mx = -200, my = -200; // raw mouse
+    let rx = -200, ry = -200; // ring lerp
+    const dotPositions = Array.from({ length: TRAIL_COUNT }, () => ({ x: -200, y: -200 }));
 
-  // Main dot
-  const mainDot = document.createElement('div');
-  mainDot.className = 'ct-dot ct-main';
-  document.body.appendChild(mainDot);
+    // Main dot
+    const mainDot = document.createElement('div');
+    mainDot.className = 'ct-dot ct-main';
+    document.body.appendChild(mainDot);
 
-  // Ring
-  const ring = document.createElement('div');
-  ring.className = 'ct-dot ct-ring';
-  document.body.appendChild(ring);
+    // Ring
+    const ring = document.createElement('div');
+    ring.className = 'ct-dot ct-ring';
+    document.body.appendChild(ring);
 
-  // Trail
-  for (let i = 0; i < TRAIL_COUNT; i++) {
-    const d = document.createElement('div');
-    d.className = 'ct-dot ct-trail';
-    const frac = (i + 1) / TRAIL_COUNT; // 0→1 from newest to oldest
-    const size = Math.round(8 - frac * 6);     // 8→2 px
-    const alpha = (1 - frac) * 0.55;
-    d.style.cssText = `width:${size}px;height:${size}px;opacity:${alpha};`;
-    document.body.appendChild(d);
-    trailDots.push(d);
-  }
+    // Trail
+    for (let i = 0; i < TRAIL_COUNT; i++) {
+      const d = document.createElement('div');
+      d.className = 'ct-dot ct-trail';
+      const frac = (i + 1) / TRAIL_COUNT; // 0→1 from newest to oldest
+      const size = Math.round(8 - frac * 6);     // 8→2 px
+      const alpha = (1 - frac) * 0.55;
+      d.style.cssText = `width:${size}px;height:${size}px;opacity:${alpha};`;
+      document.body.appendChild(d);
+      trailDots.push(d);
+    }
 
-  // Track mouse
-  document.addEventListener('mousemove', (e) => {
-    mx = e.clientX;
-    my = e.clientY;
-    mainDot.style.left = mx + 'px';
-    mainDot.style.top  = my + 'px';
-  });
-
-  // Click flash
-  document.addEventListener('mousedown', () => {
-    mainDot.classList.add('clicked');
-    ring.classList.add('clicked');
-  });
-  document.addEventListener('mouseup', () => {
-    mainDot.classList.remove('clicked');
-    ring.classList.remove('clicked');
-  });
-
-  // Hover states on interactive elements
-  const interactives = () => document.querySelectorAll('a,button,[role="button"],.skill-card,#laptop-wrapper,.laptop');
-  function bindHover() {
-    interactives().forEach(el => {
-      el.addEventListener('mouseenter', () => { mainDot.classList.add('hovered'); ring.classList.add('hovered'); });
-      el.addEventListener('mouseleave', () => { mainDot.classList.remove('hovered'); ring.classList.remove('hovered'); });
-    });
-  }
-  bindHover();
-
-  // Animation loop
-  let prevPositions = Array.from({ length: TRAIL_COUNT }, () => ({ x: -200, y: -200 }));
-  prevPositions.unshift({ x: mx, y: my }); // head
-
-  function trailLoop() {
-    // Ring lags behind
-    rx += (mx - rx) * 0.12;
-    ry += (my - ry) * 0.12;
-    ring.style.left = rx + 'px';
-    ring.style.top  = ry + 'px';
-
-    // Shift trail history
-    dotPositions.unshift({ x: mx, y: my });
-    dotPositions.length = TRAIL_COUNT + 1;
-
-    trailDots.forEach((dot, i) => {
-      const pos = dotPositions[i + 1] || dotPositions[dotPositions.length - 1];
-      dot.style.left = pos.x + 'px';
-      dot.style.top  = pos.y + 'px';
+    // Track mouse
+    document.addEventListener('mousemove', (e) => {
+      mx = e.clientX;
+      my = e.clientY;
+      mainDot.style.left = mx + 'px';
+      mainDot.style.top  = my + 'px';
     });
 
-    requestAnimationFrame(trailLoop);
+    // Click flash
+    document.addEventListener('mousedown', () => {
+      mainDot.classList.add('clicked');
+      ring.classList.add('clicked');
+    });
+    document.addEventListener('mouseup', () => {
+      mainDot.classList.remove('clicked');
+      ring.classList.remove('clicked');
+    });
+
+    // Hover states on interactive elements
+    const interactives = () => document.querySelectorAll('a,button,[role="button"],.skill-card,#laptop-wrapper,.laptop');
+    function bindHover() {
+      interactives().forEach(el => {
+        el.addEventListener('mouseenter', () => { mainDot.classList.add('hovered'); ring.classList.add('hovered'); });
+        el.addEventListener('mouseleave', () => { mainDot.classList.remove('hovered'); ring.classList.remove('hovered'); });
+      });
+    }
+    bindHover();
+
+    // Animation loop
+    let prevPositions = Array.from({ length: TRAIL_COUNT }, () => ({ x: -200, y: -200 }));
+    prevPositions.unshift({ x: mx, y: my }); // head
+
+    function trailLoop() {
+      // Ring lags behind
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px';
+      ring.style.top  = ry + 'px';
+
+      // Shift trail history
+      dotPositions.unshift({ x: mx, y: my });
+      dotPositions.length = TRAIL_COUNT + 1;
+
+      trailDots.forEach((dot, i) => {
+        const pos = dotPositions[i + 1] || dotPositions[dotPositions.length - 1];
+        dot.style.left = pos.x + 'px';
+        dot.style.top  = pos.y + 'px';
+      });
+
+      requestAnimationFrame(trailLoop);
+    }
+    trailLoop();
   }
-  trailLoop();
 
   // ── Lenis smooth scroll ───────────────────────────────────────────────
   if (typeof Lenis !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
