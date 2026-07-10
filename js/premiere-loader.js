@@ -567,6 +567,16 @@
         #scroll-indicator, .scroll-indicator {
           display: none !important;
         }
+        /* Kill custom cursor trail dots — use system cursor only */
+        .ct-dot {
+          display: none !important;
+          opacity: 0 !important;
+          pointer-events: none !important;
+        }
+        /* Restore visible system cursor inside iframe */
+        html, body, * {
+          cursor: auto;
+        }
         /* Hide navbar sidebar */
         #main-nav, nav, .fixed.left-0.top-0 { 
           display: none !important; 
@@ -632,16 +642,18 @@
       // Set default cursor class
       document.body.classList.add('tool-select');
       
-      // Mark elements for Type Tool editing — exclude pricing/package/button text
-      document.querySelectorAll('h1, h2, h3, p, span, strong').forEach(el => {
-        if (el.children.length === 0 && el.textContent.trim().length > 0) {
-          // Skip elements inside pricing cards, buttons, nav, package blocks
-          const skip = el.closest(
-            '.price, .pricing, .package, .plan, [class*="price"], [class*="package"], [class*="plan"], button, a, nav, .btn, .cta'
-          );
-          if (!skip) el.setAttribute('data-editable', 'true');
-        }
-      });
+      // Mark elements for Type Tool editing — skip services page and pricing/button text
+      const isServicesPage = window.location.pathname.includes('page_3');
+      if (!isServicesPage) {
+        document.querySelectorAll('h1, h2, h3, p, span, strong').forEach(el => {
+          if (el.children.length === 0 && el.textContent.trim().length > 0) {
+            const skip = el.closest(
+              '.price, .pricing, .package, .plan, [class*="price"], [class*="package"], [class*="plan"], button, a, nav, .btn, .cta'
+            );
+            if (!skip) el.setAttribute('data-editable', 'true');
+          }
+        });
+      }
       
       // 2. Setup Scroll Communication
       window.addEventListener('scroll', () => {
