@@ -4,42 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>About — Just Hemang</title>
-  <meta name="description" content="About Just Hemang — video editor, graphic designer, and frontend developer." />
-  <meta name="theme-color" content="#f5f0e8" />
+  <meta name="description" content="About Just Hemang." />
+  <meta name="theme-color" content="#0055e5" />
   <link rel="icon" href="../Logo Transparent.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Consolas&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
-  <noscript>
-    <style>
-      .anim-clip,.anim-scale,.anim-slide-left,.anim-slide-right,.anim-rotate,.anim-blur{clip-path:none;transform:none;opacity:1;filter:none}
-      .menu-overlay{display:none!important}
-    </style>
-  </noscript>
 </head>
 <body class="page-sub">
 
   <div class="page-transition" id="pageTransition" aria-hidden="true">
-    <div class="pt-bar pt-bar--1"></div>
-    <div class="pt-bar pt-bar--2"></div>
-    <div class="pt-bar pt-bar--3"></div>
-    <div class="pt-bar pt-bar--4"></div>
-    <div class="pt-bar pt-bar--5"></div>
-    <div class="pt-circle"></div>
+    <div class="pt-bar pt-bar--1"></div><div class="pt-bar pt-bar--2"></div><div class="pt-bar pt-bar--3"></div><div class="pt-bar pt-bar--4"></div><div class="pt-bar pt-bar--5"></div><div class="pt-circle"></div>
   </div>
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
-  <div class="cursor" id="cursor" aria-hidden="true">
-    <div class="cursor__ring" id="cursorRing"></div>
-    <div class="cursor__dot" id="cursorDot"></div>
-  </div>
-  <div class="fx-grain" aria-hidden="true"></div>
-  <div class="fx-scanlines" aria-hidden="true"></div>
-  <div class="fx-vignette" aria-hidden="true"></div>
+  <div class="cursor" id="cursor" aria-hidden="true"><div class="cursor__ring" id="cursorRing"></div><div class="cursor__dot" id="cursorDot"></div></div>
+  <div class="fx-scanlines" aria-hidden="true"></div><div class="fx-vignette" aria-hidden="true"></div>
 
-  <button class="menu-fab" id="menuFab" aria-label="Open menu" aria-expanded="false">
-    <i></i><i></i><i></i>
-  </button>
+  <button class="menu-fab" id="menuFab" aria-label="Open menu" aria-expanded="false"><i></i><i></i><i></i></button>
 
   <div class="menu-overlay" id="menuOverlay" aria-hidden="true">
     <nav class="menu-overlay__links" aria-label="Menu">
@@ -62,6 +44,13 @@
       <p class="section__eyebrow mono anim-slide-left">The person</p>
       <h1 class="page-hero__title text-split">About</h1>
       <div class="accent-line"></div>
+    </section>
+
+    <section class="stats" id="stats">
+      <div class="stat"><p class="stat__num">150+</p><p class="stat__label mono">Projects</p></div>
+      <div class="stat"><p class="stat__num">5+</p><p class="stat__label mono">Years Exp</p></div>
+      <div class="stat"><p class="stat__num">50+</p><p class="stat__label mono">Clients</p></div>
+      <div class="stat"><p class="stat__num">99%</p><p class="stat__label mono">Satisfaction</p></div>
     </section>
 
     <section class="section" id="statement">
@@ -110,30 +99,12 @@
       <p class="section__eyebrow mono anim-slide-left">Capabilities</p>
       <h2 class="section__heading text-split">Tools & Skills</h2>
       <div class="capabilities__grid">
-        <div class="capability">
-          <span class="capability__icon">🎬</span>
-          <h3 class="capability__name">Video Editing</h3>
-          <p class="capability__tools mono">Premiere Pro, DaVinci Resolve, Final Cut Pro</p>
-        </div>
-        <div class="capability">
-          <span class="capability__icon">🎨</span>
-          <h3 class="capability__name">Graphic Design</h3>
-          <p class="capability__tools mono">Photoshop, Illustrator, Figma</p>
-        </div>
-        <div class="capability">
-          <span class="capability__icon">💻</span>
-          <h3 class="capability__name">Web Development</h3>
-          <p class="capability__tools mono">HTML, CSS, JavaScript, React, Three.js</p>
-        </div>
-        <div class="capability">
-          <span class="capability__icon">✨</span>
-          <h3 class="capability__name">Motion Graphics</h3>
-          <p class="capability__tools mono">After Effects, Cinema 4D, Blender</p>
-        </div>
+        <div class="capability"><span class="capability__icon">🎬</span><h3 class="capability__name">Video Editing</h3><p class="capability__tools mono">Premiere Pro, DaVinci Resolve, Final Cut Pro</p></div>
+        <div class="capability"><span class="capability__icon">🎨</span><h3 class="capability__name">Graphic Design</h3><p class="capability__tools mono">Photoshop, Illustrator, Figma</p></div>
+        <div class="capability"><span class="capability__icon">💻</span><h3 class="capability__name">Web Development</h3><p class="capability__tools mono">HTML, CSS, JavaScript, React, Three.js</p></div>
+        <div class="capability"><span class="capability__icon">✨</span><h3 class="capability__name">Motion Graphics</h3><p class="capability__tools mono">After Effects, Cinema 4D, Blender</p></div>
       </div>
-      <div style="text-align:center">
-        <span class="exp-badge mono anim-scale">5+ Years Experience</span>
-      </div>
+      <div style="text-align:center"><span class="exp-badge mono anim-scale">5+ Years Experience</span></div>
     </section>
 
     <section class="page-cta">
@@ -144,15 +115,13 @@
 
   <footer class="footer">
     <img class="footer__logo" src="../Logo Transparent.png" alt="Just Hemang" />
-    <div class="footer__row">
-      <div class="footer__links">
-        <a href="mailto:justhemang@gmail.com">Email</a>
-        <a href="https://github.com/justhemang" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://www.linkedin.com/in/hemang-luthra-328a65303/" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="https://www.instagram.com/justhemang6/" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://youtube.com/@JustHemang" target="_blank" rel="noopener">YouTube</a>
-      </div>
-    </div>
+    <div class="footer__row"><div class="footer__links">
+      <a href="mailto:justhemang@gmail.com">Email</a>
+      <a href="https://github.com/justhemang" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/hemang-luthra-328a65303/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://www.instagram.com/justhemang6/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://youtube.com/@JustHemang" target="_blank" rel="noopener">YouTube</a>
+    </div></div>
     <p class="footer__copy mono">&copy; 2026 Just Hemang. All rights reserved.</p>
   </footer>
 
