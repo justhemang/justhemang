@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Work — Just Hemang</title>
+  <meta name="description" content="Selected work from Just Hemang." />
+  <meta name="theme-color" content="#0055e5" />
+  <link rel="icon" href="../Logo Transparent.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Consolas&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body class="page-sub">
+
+  <div class="page-transition" id="pageTransition" aria-hidden="true">
+    <div class="pt-bar pt-bar--1"></div><div class="pt-bar pt-bar--2"></div><div class="pt-bar pt-bar--3"></div><div class="pt-bar pt-bar--4"></div><div class="pt-bar pt-bar--5"></div><div class="pt-circle"></div>
+  </div>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+  <div class="cursor" id="cursor" aria-hidden="true"><div class="cursor__ring" id="cursorRing"></div><div class="cursor__dot" id="cursorDot"></div></div>
+  <div class="fx-scanlines" aria-hidden="true"></div><div class="fx-vignette" aria-hidden="true"></div>
+
+  <button class="menu-fab" id="menuFab" aria-label="Open menu" aria-expanded="false"><i></i><i></i><i></i></button>
+
+  <div class="menu-overlay" id="menuOverlay" aria-hidden="true">
+    <nav class="menu-overlay__links" aria-label="Menu">
+      <a class="menu-overlay__link" href="../index.html" data-i="01">Home</a>
+      <a class="menu-overlay__link" href="page_about.html" data-i="02">About</a>
+      <a class="menu-overlay__link" href="page_2.html" data-i="03">Work</a>
+      <a class="menu-overlay__link" href="page_3.html" data-i="04">Services</a>
+      <a class="menu-overlay__link" href="page_4.html" data-i="05">Contact</a>
+    </nav>
+    <div class="menu-overlay__foot">
+      <a href="https://github.com/justhemang" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/hemang-luthra-328a65303/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://www.instagram.com/justhemang6/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://youtube.com/@JustHemang" target="_blank" rel="noopener">YouTube</a>
+    </div>
+  </div>
+
+  <main>
+    <section class="page-hero">
+      <p class="section__eyebrow mono anim-slide-left">Portfolio</p>
+      <h1 class="page-hero__title text-split">Work</h1>
+      <div class="accent-line"></div>
+    </section>
+
+    <section class="section" id="reel">
+      <p class="section__eyebrow mono anim-slide-left">Showreel</p>
+      <h2 class="section__heading text-split">The Reel</h2>
+      <div class="reel">
+        <p class="reel__desc mono anim-slide-up">A curated selection of recent video editing, motion graphics, and creative projects.</p>
+        <div class="reel__wrap anim-scale">
+          <iframe src="https://www.youtube.com/embed/_9LGzL6rh2I" title="Just Hemang Showreel" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- Floating Premiere Pro UI -->
+    <div class="pm-float" id="pmFloat" aria-hidden="true">
+      <div class="pm-float__titlebar" id="pmDragBar">
+        <div class="pm-float__dots">
+          <div class="pm-float__dot pm-float__dot--r"></div>
+          <div class="pm-float__dot pm-float__dot--y"></div>
+          <div class="pm-float__dot pm-float__dot--g"></div>
+        </div>
+        <span class="pm-float__title">Adobe Premiere Pro — justhemang.vercel.app</span>
+        <span></span>
+      </div>
+      <div class="pm-float__menu">
+        <span>File</span><span>Edit</span><span>Clip</span><span>Sequence</span><span>Markers</span><span>View</span><span>Window</span><span>Help</span>
+      </div>
+      <div class="pm-float__body">
+        <div class="pm-float__panel">
+          <div class="pm-float__panel-head">Project <span style="color:#6ec6c6">·</span></div>
+          <div class="pm-float__files">
+            <div class="pm-float__file active">
+              <div class="pm-float__file-icon pm-float__file-icon--v">V</div>
+              justhemang.vercel.app
+            </div>
+            <div class="pm-float__file">
+              <div class="pm-float__file-icon pm-float__file-icon--s">S</div>
+              showreel.mp4
+            </div>
+            <div class="pm-float__file">
+              <div class="pm-float__file-icon pm-float__file-icon--v">V</div>
+              annual_day_cut.mp4
+            </div>
+            <div class="pm-float__file">
+              <div class="pm-float__file-icon pm-float__file-icon--v">V</div>
+              documentary_v3.mov
+            </div>
+            <div class="pm-float__file">
+              <div class="pm-float__file-icon pm-float__file-icon--a">A</div>
+              bgm_track.wav
+            </div>
+            <div class="pm-float__file">
+              <div class="pm-float__file-icon pm-float__file-icon--a">A</div>
+              sfx_pack.wav
+            </div>
+            <div class="pm-float__file">
+              <div class="pm-float__file-icon pm-float__file-icon--s">S</div>
+              sequence_01.prproj
+            </div>
+            <div class="pm-float__file">
+              <div class="pm-float__file-icon pm-float__file-icon--v">V</div>
+              motion_reel_2026.mp4
+            </div>
+          </div>
+        </div>
+        <div class="pm-float__preview">
+          <div class="pm-float__screen">
+            <span class="pm-float__screen-label">Program · Sequence 01</span>
+            <div class="pm-float__iframe-wrap">
+              <iframe src="https://justhemang.vercel.app/" title="Website Preview" loading="lazy" sandbox="allow-scripts allow-same-origin"></iframe>
+            </div>
+            <span class="pm-float__time" id="pmTimecode">00:00:00:00</span>
+          </div>
+          <div class="pm-float__tl">
+            <div class="pm-float__tl-header">
+              <span>Timeline</span>
+              <span style="color:#6ec6c6">Sequence 01</span>
+            </div>
+            <div class="pm-float__ruler">
+              <div class="pm-float__ruler-ticks"></div>
+              <div class="pm-float__playhead" id="pmPlayhead"></div>
+            </div>
+            <div class="pm-float__tracks">
+              <div class="pm-float__track">
+                <div class="pm-float__track-label">V2</div>
+                <div class="pm-float__track-clips">
+                  <div class="pm-float__clip pm-float__clip--v2">Title Overlay</div>
+                </div>
+              </div>
+              <div class="pm-float__track">
+                <div class="pm-float__track-label">V1</div>
+                <div class="pm-float__track-clips">
+                  <div class="pm-float__clip pm-float__clip--v1">justhemang.vercel.app</div>
+                </div>
+              </div>
+              <div class="pm-float__track">
+                <div class="pm-float__track-label">A1</div>
+                <div class="pm-float__track-clips">
+                  <div class="pm-float__clip pm-float__clip--a1">bgm_track.wav</div>
+                </div>
+              </div>
+              <div class="pm-float__track">
+                <div class="pm-float__track-label">A2</div>
+                <div class="pm-float__track-clips">
+                  <div class="pm-float__clip pm-float__clip--a2">sfx_pack.wav</div>
+                </div>
+              </div>
+              <div class="pm-float__track">
+                <div class="pm-float__track-label">T</div>
+                <div class="pm-float__track-clips">
+                  <div class="pm-float__clip pm-float__clip--t">Just Hemang</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="section work" id="work">
+      <p class="section__eyebrow mono anim-slide-left">Selected work</p>
+      <h2 class="section__heading text-split">Projects</h2>
+      <div class="work__grid">
+        <article class="work__item">
+          <span class="work__num mono">01</span>
+          <div>
+            <h3 class="work__client">Annual Day — Behind the Scenes</h3>
+            <p class="work__desc mono">Full event coverage: multi-cam editing, color grading, sound design.</p>
+            <div class="work__tags">
+              <span class="work__tag">Premiere Pro</span>
+              <span class="work__tag">Color Grading</span>
+              <span class="work__tag">Event</span>
+            </div>
+          </div>
+        </article>
+        <article class="work__item">
+          <span class="work__num mono">02</span>
+          <div>
+            <h3 class="work__client">Documentary Cut — Short Film</h3>
+            <p class="work__desc mono">Narrative editing with motion graphics, lower thirds, cinematic transitions.</p>
+            <div class="work__tags">
+              <span class="work__tag">After Effects</span>
+              <span class="work__tag">Motion</span>
+              <span class="work__tag">Documentary</span>
+            </div>
+          </div>
+        </article>
+        <article class="work__item">
+          <span class="work__num mono">03</span>
+          <div>
+            <h3 class="work__client">Motion Reel 2026</h3>
+            <p class="work__desc mono">Kinetic typography, logo animations, dynamic transitions.</p>
+            <div class="work__tags">
+              <span class="work__tag">After Effects</span>
+              <span class="work__tag">Kinetic Type</span>
+              <span class="work__tag">Motion</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="page-cta">
+      <h2 class="text-split">Want to work together?</h2>
+      <a class="cta__btn" href="page_4.html">Get in touch</a>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <img class="footer__logo" src="../Logo Transparent.png" alt="Just Hemang" />
+    <div class="footer__row">
+      <div class="footer__links">
+        <a href="mailto:justhemang@gmail.com">Email</a>
+        <a href="https://github.com/justhemang" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/hemang-luthra-328a65303/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.instagram.com/justhemang6/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://youtube.com/@JustHemang" target="_blank" rel="noopener">YouTube</a>
+      </div>
+    </div>
+    <p class="footer__copy mono">&copy; 2026 Just Hemang. All rights reserved.</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="../js/app.js"></script>
+</body>
+</html>
