@@ -2,12 +2,12 @@
    JUST HEMANG — Portfolio
    ============================================================ */
 :root {
-  --ink: #2a2520;
-  --ink-2: #3d3630;
-  --ink-3: #5a524a;
-  --paper: #f5f0e8;
-  --paper-2: #e8e0d4;
-  --paper-3: #d4ccc0;
+  --ink: #1a1a1a;
+  --ink-2: #2a2a2a;
+  --ink-3: #444;
+  --paper: #f0ebe3;
+  --paper-2: #e0d8cc;
+  --paper-3: #c8c0b4;
   --accent: #c4652a;
   --accent-dim: rgba(196,101,42,0.15);
   --teal: #2a7a7a;
@@ -313,7 +313,7 @@ body.has-cursor .cursor{display:block}
 .contact-form__submit:hover{background:var(--ink);color:var(--paper);transform:translateY(-2px);box-shadow:0 6px 20px rgba(42,37,32,.15)}
 
 /* sub-page overrides */
-body.page-sub main{max-width:960px;margin:0 auto;padding:0 var(--pad)}
+body.page-sub main{max-width:100%;margin:0 auto;padding:0 var(--pad)}
 
 /* ============================================================
    RESPONSIVE

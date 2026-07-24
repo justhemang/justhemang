@@ -98,10 +98,21 @@ function initCursor() {
   if (!FINE_POINTER || REDUCED) return;
   document.body.classList.add('has-cursor');
   const dot = $('#cursorDot');
+  const ring = $('#cursorRing');
   if (!dot) return;
+  let mx = 0, my = 0, rx = 0, ry = 0;
   addEventListener('mousemove', (e) => {
-    dot.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+    mx = e.clientX; my = e.clientY;
+    dot.style.transform = `translate(${mx}px, ${my}px)`;
   }, { passive: true });
+  if (ring) {
+    (function loop() {
+      rx += (mx - rx) * 0.15;
+      ry += (my - ry) * 0.15;
+      ring.style.transform = `translate(${rx}px, ${ry}px)`;
+      requestAnimationFrame(loop);
+    })();
+  }
 }
 
 /* ============================================================

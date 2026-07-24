@@ -1,42 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Just Hemang — Creative Studio</title>
-  <meta name="description" content="Just Hemang — video editor, graphic designer, frontend developer." />
-  <meta name="theme-color" content="#2a2520" />
+  <meta name="description"
+    content="Just Hemang is a creative studio specializing in video editing, graphic design, web development, and freelance creative services." />
+  <meta name="theme-color" content="#0b0b09" />
   <link rel="icon" href="Logo Transparent.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Consolas&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
+  <noscript>
+    <style>
+      .anim-clip,
+      .anim-scale,
+      .anim-slide-left,
+      .anim-slide-right,
+      .anim-rotate,
+      .anim-blur {
+        clip-path: none;
+        transform: none;
+        opacity: 1;
+        filter: none
+      }
+
+      .menu-overlay {
+        display: none !important
+      }
+    </style>
+  </noscript>
 </head>
+
 <body>
 
-  <div class="page-transition" id="pageTransition" aria-hidden="true">
-    <div class="pt-bar pt-bar--1"></div><div class="pt-bar pt-bar--2"></div><div class="pt-bar pt-bar--3"></div><div class="pt-bar pt-bar--4"></div><div class="pt-bar pt-bar--5"></div>
-    <div class="pt-circle"></div>
-  </div>
+  <!-- ========== PAGE TRANSITION ========== -->
+  <div class="page-transition" id="pageTransition" aria-hidden="true"></div>
+
+  <!-- ========== GLOBAL FX ========== -->
+  <div class="fx-grain" aria-hidden="true"></div>
+  <div class="fx-scanlines" aria-hidden="true"></div>
+  <div class="fx-vignette" aria-hidden="true"></div>
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
   <div class="cursor" id="cursor" aria-hidden="true">
     <div class="cursor__ring" id="cursorRing"></div>
     <div class="cursor__dot" id="cursorDot"></div>
   </div>
-  <div class="fx-scanlines" aria-hidden="true"></div>
-  <div class="fx-vignette" aria-hidden="true"></div>
 
-  <button class="menu-fab" id="menuFab" aria-label="Open menu" aria-expanded="false">
-    <i></i><i></i><i></i>
-  </button>
+  <!-- ========== NAV ========== -->
+  <header class="nav" id="nav">
+    <a class="nav__logo" href="#top">
+      <img class="nav__logo-img" src="Logo Transparent.png" alt="JH" />
+      <span class="nav__logo-text">JUST HEMANG</span>
+    </a>
+    <button class="nav__menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+      <div class="nav__bars"><i></i><i></i><i></i></div>
+      <span>MENU</span>
+    </button>
+  </header>
 
+  <!-- fullscreen menu -->
   <div class="menu-overlay" id="menuOverlay" aria-hidden="true">
     <nav class="menu-overlay__links" aria-label="Menu">
-      <a class="menu-overlay__link" href="index.html" data-i="01">Home</a>
-      <a class="menu-overlay__link" href="html/page_about.html" data-i="02">About</a>
-      <a class="menu-overlay__link" href="html/page_2.html" data-i="03">Work</a>
-      <a class="menu-overlay__link" href="html/page_3.html" data-i="04">Services</a>
-      <a class="menu-overlay__link" href="html/page_4.html" data-i="05">Contact</a>
+      <a class="menu-overlay__link" href="/about" data-i="01">About</a>
+      <a class="menu-overlay__link" href="/work" data-i="02">Work</a>
+      <a class="menu-overlay__link" href="/services" data-i="03">Services</a>
+      <a class="menu-overlay__link" href="/contact" data-i="04">Contact</a>
     </nav>
     <div class="menu-overlay__foot">
       <a href="https://github.com/justhemang" target="_blank" rel="noopener">GitHub</a>
@@ -47,177 +81,129 @@
   </div>
 
   <main id="top">
+
+    <!-- ========== HERO ========== -->
     <section class="hero" id="hero">
       <canvas class="hero__canvas" id="heroCanvas" aria-hidden="true"></canvas>
       <div class="hero__content">
         <p class="hero__pre mono">Video Editor &middot; Graphic Designer &middot; Frontend Dev</p>
         <h1 class="hero__title" aria-label="Just Hemang">
           <span class="hero__line hero__line--top">JUST</span>
-          <span class="hero__line hero__line--big">
-            <span class="hero__char">H</span><span class="hero__char">E</span><span class="hero__char">M</span><span class="hero__char">A</span><span class="hero__char">N</span><span class="hero__char">G</span>
+          <span class="hero__line hero__line--big" data-text="HEMANG">
+            <span class="hero__char">H</span><span class="hero__char">E</span><span class="hero__char">M</span><span
+              class="hero__char">A</span><span class="hero__char">N</span><span class="hero__char">G</span>
           </span>
         </h1>
-        <div class="accent-line"></div>
+        <div class="accent-line" data-anim="accent-line"></div>
         <p class="hero__tagline mono">I don't just push pixels — I slam them into place.</p>
       </div>
       <div class="hero__scroll mono" aria-hidden="true">Scroll to explore</div>
     </section>
 
-    <section class="stats" id="stats">
-      <div class="stat"><p class="stat__num">150+</p><p class="stat__label mono">Projects</p></div>
-      <div class="stat"><p class="stat__num">5+</p><p class="stat__label mono">Years Exp</p></div>
-      <div class="stat"><p class="stat__num">50+</p><p class="stat__label mono">Clients</p></div>
-      <div class="stat"><p class="stat__num">99%</p><p class="stat__label mono">Satisfaction</p></div>
-    </section>
-
-    <section class="section" id="about">
+    <!-- ========== STATEMENT ========== -->
+    <section class="section" id="statement">
       <div class="statement">
         <p class="section__eyebrow mono anim-slide-left">About</p>
-        <h2 class="statement__heading text-split">THE CRAFT<br/>BEHIND<br/>THE WORK</h2>
-        <div class="accent-line"></div>
-        <p class="statement__text anim-slide-up">I'm Hemang Luthra — a video editor, graphic designer, and frontend developer. I combine technical precision with creative vision to build digital experiences that move people. Every frame is intentional, every cut deliberate, every line of code purposeful.</p>
+        <h2 class="statement__heading text-split">THE CRAFT<br />BEHIND<br />THE WORK</h2>
+        <div class="accent-line" data-anim="accent-line"></div>
+        <p class="statement__text">
+          Combining technical precision with creative vision. Every frame is intentional, every cut is deliberate. I
+          specialize in high-impact video production, kinetic typography, and immersive digital experiences.
+        </p>
       </div>
     </section>
 
-    <section class="section" id="services">
-      <p class="section__eyebrow mono anim-slide-left">What I do</p>
-      <h2 class="section__heading text-split">Services</h2>
-      <div class="services-grid">
-        <div class="services-grid__card anim-slide-up">
-          <div class="services-grid__icon">🎬</div>
-          <h3 class="services-grid__name">Video Editing</h3>
-          <p class="services-grid__desc mono">Multi-cam editing, color grading, sound design, and post-production for events, documentaries, and commercial projects.</p>
-          <div class="services-grid__tags"><span class="work__tag">Premiere Pro</span><span class="work__tag">DaVinci Resolve</span></div>
-        </div>
-        <div class="services-grid__card anim-slide-up">
-          <div class="services-grid__icon">🎨</div>
-          <h3 class="services-grid__name">Graphic Design</h3>
-          <p class="services-grid__desc mono">Brand identity, visual systems, poster design, and print collateral. Visual languages that are instantly recognizable.</p>
-          <div class="services-grid__tags"><span class="work__tag">Photoshop</span><span class="work__tag">Illustrator</span></div>
-        </div>
-        <div class="services-grid__card anim-slide-up">
-          <div class="services-grid__icon">💻</div>
-          <h3 class="services-grid__name">Web Development</h3>
-          <p class="services-grid__desc mono">Immersive digital experiences using modern frameworks and creative code. Performant, accessible, breathtaking.</p>
-          <div class="services-grid__tags"><span class="work__tag">React</span><span class="work__tag">Three.js</span><span class="work__tag">Next.js</span></div>
-        </div>
-        <div class="services-grid__card anim-slide-up">
-          <div class="services-grid__icon">✨</div>
-          <h3 class="services-grid__name">Motion Graphics</h3>
-          <p class="services-grid__desc mono">Kinetic typography, logo animations, dynamic transitions, and visual effects. Bringing static designs to life.</p>
-          <div class="services-grid__tags"><span class="work__tag">After Effects</span><span class="work__tag">Cinema 4D</span></div>
-        </div>
-        <div class="services-grid__card anim-slide-up">
-          <div class="services-grid__icon">🎞️</div>
-          <h3 class="services-grid__name">Color Grading</h3>
-          <p class="services-grid__desc mono">Professional color correction and creative grading. Cinematic quality, mood, and atmosphere for your footage.</p>
-          <div class="services-grid__tags"><span class="work__tag">DaVinci Resolve</span><span class="work__tag">LUTs</span></div>
-        </div>
-        <div class="services-grid__card anim-slide-up">
-          <div class="services-grid__icon">📐</div>
-          <h3 class="services-grid__name">Creative Direction</h3>
-          <p class="services-grid__desc mono">End-to-end creative strategy for campaigns, brand launches, and content series. From concept to final delivery.</p>
-          <div class="services-grid__tags"><span class="work__tag">Strategy</span><span class="work__tag">Art Direction</span></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="toolkit" id="toolkit">
-      <p class="section__eyebrow mono anim-slide-left">Toolkit</p>
-      <h2 class="section__heading text-split">Creative Arsenal</h2>
-      <div class="toolkit__grid">
-        <div class="toolkit__card"><div class="toolkit__icon">Pr</div><h3 class="toolkit__name">Premiere Pro</h3><p class="toolkit__role mono">Video Editing</p></div>
-        <div class="toolkit__card"><div class="toolkit__icon">Ae</div><h3 class="toolkit__name">After Effects</h3><p class="toolkit__role mono">Motion Graphics</p></div>
-        <div class="toolkit__card"><div class="toolkit__icon">Ps</div><h3 class="toolkit__name">Photoshop</h3><p class="toolkit__role mono">Graphic Design</p></div>
-        <div class="toolkit__card"><div class="toolkit__icon">Ai</div><h3 class="toolkit__name">Illustrator</h3><p class="toolkit__role mono">Vector Design</p></div>
-        <div class="toolkit__card"><div class="toolkit__icon">Dr</div><h3 class="toolkit__name">DaVinci Resolve</h3><p class="toolkit__role mono">Color Grading</p></div>
-        <div class="toolkit__card"><div class="toolkit__icon">Re</div><h3 class="toolkit__name">React / Next.js</h3><p class="toolkit__role mono">Frontend Dev</p></div>
-        <div class="toolkit__card"><div class="toolkit__icon">Hc</div><h3 class="toolkit__name">HTML / CSS / JS</h3><p class="toolkit__role mono">Web Tech</p></div>
-        <div class="toolkit__card"><div class="toolkit__icon">Ph</div><h3 class="toolkit__name">Photography</h3><p class="toolkit__role mono">Composition & Edit</p></div>
-      </div>
-    </section>
-
-    <section class="section" id="reel">
-      <p class="section__eyebrow mono anim-slide-left">Showreel</p>
-      <h2 class="section__heading text-split">Latest Work</h2>
-      <div class="reel">
-        <div class="reel__wrap anim-scale">
-          <iframe src="https://www.youtube.com/embed/_9LGzL6rh2I" title="Just Hemang Showreel" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-        </div>
-      </div>
-      <div class="reel">
-        <div class="reel__wrap anim-scale">
-          <iframe src="https://www.youtube.com/embed/9hQVmL1TF74" title="Just Hemang — Behind the Scenes" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-        </div>
-      </div>
-    </section>
-
+    <!-- ========== WORK ========== -->
     <section class="section work" id="work">
       <p class="section__eyebrow mono anim-slide-left">Selected work</p>
       <h2 class="section__heading text-split">Projects</h2>
       <div class="work__grid">
-        <article class="work__item"><span class="work__num mono">01</span><div><h3 class="work__client">Annual Day — Behind the Scenes</h3><p class="work__desc mono">Full event coverage: multi-cam editing, color grading, sound design.</p><div class="work__tags"><span class="work__tag">Premiere Pro</span><span class="work__tag">Color Grading</span><span class="work__tag">Event</span></div></div></article>
-        <article class="work__item"><span class="work__num mono">02</span><div><h3 class="work__client">Documentary Cut — Short Film</h3><p class="work__desc mono">Narrative editing with motion graphics, lower thirds, and cinematic transitions.</p><div class="work__tags"><span class="work__tag">After Effects</span><span class="work__tag">Motion</span><span class="work__tag">Documentary</span></div></div></article>
-        <article class="work__item"><span class="work__num mono">03</span><div><h3 class="work__client">Motion Reel 2026</h3><p class="work__desc mono">Kinetic typography, logo animations, and dynamic transitions.</p><div class="work__tags"><span class="work__tag">After Effects</span><span class="work__tag">Kinetic Type</span><span class="work__tag">Motion</span></div></div></article>
-        <article class="work__item"><span class="work__num mono">04</span><div><h3 class="work__client">Brand Identity — Studio Launch</h3><p class="work__desc mono">Full brand system: logo, typography, color palette, stationery, and social media kit.</p><div class="work__tags"><span class="work__tag">Illustrator</span><span class="work__tag">Photoshop</span><span class="work__tag">Branding</span></div></div></article>
-        <article class="work__item"><span class="work__num mono">05</span><div><h3 class="work__client">E-Commerce Frontend</h3><p class="work__desc mono">Next.js storefront with Three.js product viewer, GSAP animations, and Stripe integration.</p><div class="work__tags"><span class="work__tag">React</span><span class="work__tag">Three.js</span><span class="work__tag">Next.js</span></div></div></article>
-        <article class="work__item"><span class="work__num mono">06</span><div><h3 class="work__client">Wedding Highlight Film</h3><p class="work__desc mono">Cinematic wedding edit: multi-cam, drone footage, color grading, and licensed soundtrack.</p><div class="work__tags"><span class="work__tag">Premiere Pro</span><span class="work__tag">DaVinci Resolve</span><span class="work__tag">Cinematic</span></div></div></article>
-        <article class="work__item"><span class="work__num mono">07</span><div><h3 class="work__client">Social Media Campaign</h3><p class="work__desc mono">30-day content series: reels, stories, carousels, and animated graphics for a lifestyle brand.</p><div class="work__tags"><span class="work__tag">After Effects</span><span class="work__tag">Photoshop</span><span class="work__tag">Content</span></div></div></article>
-        <article class="work__item"><span class="work__num mono">08</span><div><h3 class="work__client">Music Video — Indie Artist</h3><p class="work__desc mono">Creative direction and post-production for a debut music video. VFX, color, and motion graphics.</p><div class="work__tags"><span class="work__tag">After Effects</span><span class="work__tag">Premiere Pro</span><span class="work__tag">VFX</span></div></div></article>
+        <article class="work__item">
+          <span class="work__num mono">01</span>
+          <div>
+            <h3 class="work__client">Brand Film — Echoscope</h3>
+            <p class="work__desc mono">Cinematic product launch video with kinetic typography and color grading.</p>
+          </div>
+        </article>
+        <article class="work__item">
+          <span class="work__num mono">02</span>
+          <div>
+            <h3 class="work__client">Visual Identity — Noir Studio</h3>
+            <p class="work__desc mono">Complete brand system: logo, typography, packaging, and digital presence.</p>
+          </div>
+        </article>
+        <article class="work__item">
+          <span class="work__num mono">03</span>
+          <div>
+            <h3 class="work__client">Web Platform — Milano IoT</h3>
+            <p class="work__desc mono">Full-stack dashboard for real-time monitoring of commercial coffee machines.</p>
+          </div>
+        </article>
+        <article class="work__item">
+          <span class="work__num mono">04</span>
+          <div>
+            <h3 class="work__client">Social Campaign — Freelance Reel</h3>
+            <p class="work__desc mono">Motion graphics and video editing for multi-platform content strategy.</p>
+          </div>
+        </article>
       </div>
     </section>
 
-    <section class="process" id="process">
-      <h2 class="process__heading text-split">How I Work</h2>
-      <div class="process__steps">
-        <div class="process__step"><span class="process__num">01</span><div><h3 class="process__name">Discovery</h3><p class="process__desc mono">Understanding your vision, goals, audience, and constraints. Every project starts with listening.</p></div></div>
-        <div class="process__step"><span class="process__num">02</span><div><h3 class="process__name">Concept</h3><p class="process__desc mono">Developing the creative concept, visual direction, and technical approach. Mood boards, storyboards, wireframes.</p></div></div>
-        <div class="process__step"><span class="process__num">03</span><div><h3 class="process__name">Production</h3><p class="process__desc mono">Executing with precision and craft. Editing, grading, designing, coding — whatever the project demands.</p></div></div>
-        <div class="process__step"><span class="process__num">04</span><div><h3 class="process__name">Refinement</h3><p class="process__desc mono">Collaborative feedback rounds. Polishing every frame, pixel, and interaction until it's right.</p></div></div>
-        <div class="process__step"><span class="process__num">05</span><div><h3 class="process__name">Delivery</h3><p class="process__desc mono">Final export, optimization, and handoff. On time, on spec, ready for the world.</p></div></div>
-      </div>
-    </section>
-
-    <section class="section testimonials" id="testimonials">
-      <p class="section__eyebrow mono anim-slide-left">Kind words</p>
-      <h2 class="section__heading text-split">Testimonials</h2>
-      <div class="testimonials__grid">
-        <div class="testimonials__card anim-slide-up">
-          <p class="testimonials__quote">"Hemang's eye for detail is unmatched. The event video he produced exceeded every expectation — cinematic quality, perfect pacing, and the color grading was stunning."</p>
-          <div class="testimonials__author">
-            <p class="testimonials__name">Priya Sharma</p>
-            <p class="testimonials__role mono">Event Coordinator</p>
-          </div>
+    <!-- ========== STUDIO ========== -->
+    <section class="section" id="studio">
+      <p class="section__eyebrow mono anim-slide-left">Studio</p>
+      <h2 class="section__heading text-split">Philosophy</h2>
+      <div class="studio">
+        <div class="anim-slide-left">
+          <p class="studio__statement">
+            We believe in restraint over excess. Every pixel, every frame, every line of code serves a purpose. No
+            decoration for decoration's sake — only work that moves people.
+          </p>
         </div>
-        <div class="testimonials__card anim-slide-up">
-          <p class="testimonials__quote">"Working with Just Hemang on our brand identity was seamless. He understood our vision instantly and delivered a visual system that truly represents who we are."</p>
-          <div class="testimonials__author">
-            <p class="testimonials__name">Arjun Mehta</p>
-            <p class="testimonials__role mono">Founder, Studio Arc</p>
-          </div>
-        </div>
-        <div class="testimonials__card anim-slide-up">
-          <p class="testimonials__quote">"The website he built isn't just beautiful — it's fast, accessible, and the animations are buttery smooth. Clients constantly ask who built it."</p>
-          <div class="testimonials__author">
-            <p class="testimonials__name">Kavya Reddy</p>
-            <p class="testimonials__role mono">Creative Director, Flux Media</p>
-          </div>
+        <div class="anim-slide-right">
+          <ul class="studio__services">
+            <li>Video Editing & Motion Design</li>
+            <li>Graphic Design & Brand Identity</li>
+            <li>Web Development & Creative Code</li>
+            <li>Freelance Creative Direction</li>
+          </ul>
         </div>
       </div>
     </section>
 
+    <!-- ========== TEAM ========== -->
+    <section class="section" id="team">
+      <p class="section__eyebrow mono anim-slide-left">Team</p>
+      <h2 class="section__heading text-split">People</h2>
+      <div class="anim-scale">
+        <div class="team__group">
+          <p class="team__role mono">Founder & Creative Director</p>
+          <p class="team__names">Hemang Luthra</p>
+        </div>
+        <div class="team__group">
+          <p class="team__role mono">Creative Partners</p>
+          <p class="team__names">Open to collaboration</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== MARQUEE ========== -->
     <div class="marquee" aria-hidden="true">
       <div class="marquee__track" id="marqueeTrack">
-        <span>FRONTEND DEVELOPER <span class="mark">&times;</span> VIDEO EDITOR <span class="mark">&times;</span> GRAPHIC DESIGNER <span class="mark">&times;</span> MOTION GRAPHICS <span class="mark">&times;</span> COLOR GRADING <span class="mark">&times;</span> </span>
+        <span>FRONTEND DEVELOPER <span class="mark">&times;</span> VIDEO EDITOR <span class="mark">&times;</span>
+          GRAPHIC DESIGNER <span class="mark">&times;</span> MOTION GRAPHICS <span class="mark">&times;</span> COLOR
+          GRADING <span class="mark">&times;</span> </span>
       </div>
     </div>
 
+    <!-- ========== CTA / FOOTER ========== -->
     <section class="section" id="contact">
       <div class="cta">
         <h2 class="cta__heading text-split">Let's talk</h2>
-        <a class="cta__btn" href="html/page_4.html">Book a call</a>
+        <a class="cta__btn" href="/contact">Book a call</a>
       </div>
     </section>
+
   </main>
 
   <footer class="footer">
@@ -234,9 +220,11 @@
     <p class="footer__copy mono">&copy; 2026 Just Hemang. All rights reserved.</p>
   </footer>
 
+  <!-- ========== SCRIPTS ========== -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="js/app.js"></script>
 </body>
+
 </html>
