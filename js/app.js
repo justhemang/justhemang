@@ -119,7 +119,7 @@ function initCursor() {
    FLOATING MENU
    ============================================================ */
 function initMenu() {
-  const fab = $('#menuFab');
+  const fab = $('#menuBtn') || $('#menuFab');
   const overlay = $('#menuOverlay');
   if (!fab || !overlay) return;
   const links = $$('.menu-overlay__link', overlay);
@@ -266,9 +266,9 @@ function initAnimations() {
       .from('#hero .accent-line', { scaleX: 0, duration: 0.8, ease: 'power3.inOut' }, '-=0.4')
       .from('.hero__tagline', { opacity: 0, y: 30, duration: 0.8, ease: 'power3.out' }, '-=0.3')
       .from('.hero__scroll', { opacity: 0, duration: 0.6, ease: 'power2.out' }, '-=0.1')
-      .from('.menu-fab', { opacity: 0, scale: 0, duration: 0.5, ease: 'back.out(2)' }, '-=0.4');
+      .from('.nav__menu-btn', { opacity: 0, scale: 0, duration: 0.5, ease: 'back.out(2)' }, '-=0.4');
   } else {
-    gsap.from('.menu-fab', { opacity: 0, scale: 0, duration: 0.5, ease: 'back.out(2)', delay: 0.2 });
+    gsap.from('.nav__menu-btn', { opacity: 0, scale: 0, duration: 0.5, ease: 'back.out(2)', delay: 0.2 });
   }
 
   /* text split */
@@ -541,19 +541,19 @@ function initAnimations() {
    ============================================================ */
 function initMagnetic() {
   if (!FINE_POINTER || REDUCED) return;
-  $$('.cta__btn, .menu-fab').forEach((el) => {
+  $$('.cta__btn, .nav__menu-btn').forEach((el) => {
     el.addEventListener('mousemove', (e) => {
       const rect = el.getBoundingClientRect();
       const x = e.clientX - rect.left - rect.width / 2;
       const y = e.clientY - rect.top - rect.height / 2;
-      el.style.transform = el.classList.contains('menu-fab')
-        ? `translateY(-50%) translate(${x * 0.25}px, ${y * 0.25}px)`
+      el.style.transform = el.classList.contains('nav__menu-btn')
+        ? `translate(${x * 0.25}px, ${y * 0.25}px)`
         : `translate(${x * 0.25}px, ${y * 0.25}px)`;
     }, { passive: true });
     el.addEventListener('mouseleave', () => {
       gsap.to(el, {
         x: 0, y: 0, duration: 0.4, ease: 'elastic.out(1, 0.5)',
-        onComplete: () => { if (el.classList.contains('menu-fab')) el.style.transform = 'translateY(-50%)'; }
+        onComplete: () => { if (el.classList.contains('nav__menu-btn')) el.style.transform = ''; }
       });
     });
   });
@@ -648,7 +648,7 @@ function initPageTransition() {
       e.preventDefault();
       const url = new URL(href, location.href).href;
       if (url === location.href) return;
-      const fab = $('#menuFab');
+      const fab = $('#menuBtn') || $('#menuFab');
       const overlayEl = $('#menuOverlay');
       if (fab && overlayEl && overlayEl.classList.contains('open')) {
         fab.classList.remove('open');
